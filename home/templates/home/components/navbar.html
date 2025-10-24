@@ -1,11 +1,17 @@
-<nav class="bg-white shadow">
-  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-    <a href="#" class="text-xl font-bold text-blue-700">LOGO</a>
-    <ul class="flex space-x-6 text-gray-700 font-medium">
-      <li><a href="#" class="hover:text-blue-600">Home</a></li>
-      <li><a href="#" class="hover:text-blue-600">About</a></li>
-      <li><a href="#" class="hover:text-blue-600">Analytics</a></li>
-      <li><a href="#" class="hover:text-blue-600">Contact</a></li>
-    </ul>
-  </div>
+{% load static %}
+<nav class="navbar">
+    <div class="container">
+        <div class="nav-brand">
+            <img src="{% static 'home/images/logo.png' %}" alt="Traffic Eye Logo" class="logo">
+            <span class="brand-text">TRAFFIC<br>EYE</span>
+        </div>
+        
+        <ul class="nav-menu">
+            <ul class="nav-menu">
+              <li><a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+              <li><a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About Us</a></li>
+              <li><a href="{% url 'gallery' %}" class="nav-link {% if request.resolver_match.url_name == 'gallery' %}active{% endif %}">Galeri</a></li>
+          </ul>
+        </ul>
+    </div>
 </nav>

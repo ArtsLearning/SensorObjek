@@ -1,8 +1,76 @@
-<section class="bg-gradient-to-r from-blue-800 to-blue-600 text-white py-16">
-  <div class="max-w-7xl mx-auto px-6">
-    <h2 class="text-2xl font-bold mb-4">Tentang Kami</h2>
-    <p class="max-w-3xl">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer feugiat augue euismod, vulputate massa quis, varius elit.
-    </p>
-  </div>
+{% load static %}
+
+<section class="why-section">
+    <div class="container">
+        <div class="why-wrapper">
+            <!-- Left Side - Single Image with Multiple Frames -->
+            <div class="why-images">
+                <div class="image-frames">
+                    <!-- Main Frame -->
+                    <div class="frame frame-main">
+                        <img src="{% static 'home/images/traffic-main.jpeg' %}" alt="Traffic monitoring">
+                    </div>
+                    <!-- Frame 1 - Top Right -->
+                    <div class="frame frame-1">
+                        <img src="{% static 'home/images/traffic-main.jpeg' %}" alt="Vehicle detection">
+                    </div>
+                    <!-- Frame 2 - Bottom Right -->
+                    <div class="frame frame-2">
+                        <img src="{% static 'home/images/traffic-main.jpeg' %}" alt="Pedestrian crossing">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Content -->
+            <div class="why-content">
+                <h2 class="why-title">WHY SHOULD<br>TRAFFIC EYE ?</h2>
+
+                <div class="why-features">
+                    <!-- Feature 1 -->
+                    <div class="why-item">
+                        <div class="why-icon">
+                            <div class="icon-bg icon-light"></div>
+                        </div>
+                        <div class="why-text">
+                            <h3>DETEKSI KENDARAAN REAL-TIME</h3>
+                            <p>Pemantauan lalu lintas dengan sistem pintar</p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="why-item">
+                        <div class="why-icon">
+                            <div class="icon-bg icon-badge"></div>
+                        </div>
+                        <div class="why-text">
+                            <h3>ANALISIS DATA OTOMATIS</h3>
+                            <p>Menampilkan jumlah, jenis, dan kecepatan kendaraan secara instan.</p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="why-item">
+                        <div class="why-icon">
+                            <div class="icon-bg icon-person"></div>
+                        </div>
+                        <div class="why-text">
+                            <h3>EFISIENSI</h3>
+                            <p>Mengurangi monitoring manual – sistem aktif 24/7.</p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div class="why-item">
+                        <div class="why-icon">
+                            <div class="icon-bg icon-folder"></div>
+                        </div>
+                        <div class="why-text">
+                            <h3>KEMUDAHAN DATA KEBUTUHAN ANALISIS</h3>
+                            <p>Seluruh data lalu lintas tersimpan rapi dan aman sebagai arsip untuk analisis dan pelaporan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
