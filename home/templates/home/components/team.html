@@ -1,17 +1,45 @@
 {% load static %}
-<section class="py-16 px-6 md:px-16 bg-gray-50">
-  <div class="text-center mb-12">
-    <h2 class="text-3xl font-bold text-gray-900 mb-4">Our Team</h2>
-    <p class="text-gray-600">Meet the professionals behind our success</p>
-  </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-    {% for i in "1234" %}
-    <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-200">
-      <img src="{% static 'home/images/user-placeholder.png' %}" alt="Team Member" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
-      <h3 class="text-lg font-semibold text-gray-800 mb-1">Nama Anggota {{ forloop.counter }}</h3>
-      <p class="text-gray-500 text-sm">Posisi / Jabatan</p>
-    </div>
-    {% endfor %}
-  </div>
-</section>
+<section id="ourteam" class="team-section">
+        <div class="container">
+            <h2 class="team-title">OUR TEAM</h2>
+            <p class="team-subtitle">Tim Kami yang Berdedikasi Dalam Mengembangkan Sistem Pemantauan Aktivitas Mahasiswa Berbasis AI.</p>
+
+            <div class="team-grid">
+                <!-- Member 1 -->
+                <div class="team-card">
+                    <img src="{% static 'home/images/Gawan.jpeg' %}" alt="Arthur">
+                    <h3>Muhammad Arthur P.</h3>
+                    <p>Ketua</p>
+                </div>
+
+                <!-- Member 2 -->
+                <div class="team-card">
+                    <img src="{% static 'home/images/rifqy.jpg' %}" alt="Rifqy">
+                    <h3>Muhammad Rifqy H.</h3>
+                    <p>Front-End Dev</p>
+                </div>
+
+                <!-- Member 3 -->
+                <div class="team-card">
+                    <img src="{% static 'home/images/Gawan.jpeg' %}" alt="Maul">
+                    <h3>Maulana Ramadhan</h3>
+                    <p>Back-End Dev</p>
+                </div>
+
+                <!-- Member 4 -->
+                <div class="team-card">
+                    <img src="{% static 'home/images/Gawan.jpeg' %}" alt="Dinok">
+                    <h3>M. Deza Awdino</h3>
+                    <p>UI/UX Designer</p>
+                </div>
+
+                <!-- Member 5 -->
+                <div class="team-card">
+                    <img src="{% static 'home/images/Gawan.jpeg' %}" alt="Theo">
+                    <h3>Theo Febrian S.</h3>
+                    <p>Data Analyst</p>
+                </div>
+            </div>
+        </div>
+    </section>

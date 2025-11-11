@@ -7,16 +7,9 @@ def home(request):
     }
     return render(request, 'home/index.html', context)
 
-def about(request):
-    """View untuk halaman about"""
+def livestream(request):
+    """View untuk halaman livestream"""
     context = {
-        'page_title': 'About Me',
+        'page_title': 'Livestream',
     }
-    return render(request, 'home/about.html', context)
-
-def gallery(request):
-    """View untuk halaman galeri"""
-    context = {
-        'page_title': 'Galeri',
-    }
-    return render(request, 'home/gallery.html', context)
+    return render(request, 'home/livestream.html', context)

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}LiveStream - Traffic Eye{% endblock %}
+
+{% block content %}
+<!-- LIVESTREAM NAVBAR -->
+<nav class="livestream-navbar">
+    <div class="livestream-navbar-container">
+        <button class="livestream-back-btn" onclick="window.location.href='/'">
+            &#8592;
+        </button>
+        <h1 class="livestream-navbar-title">HALAMAN LIVESTREAM</h1>
+        <div class="livestream-navbar-logo">
+            <img src="{% static 'home/images/logo.png' %}" alt="Traffic Eye Logo">
+            <span>TRAFFIC<br>EYE</span>
+        </div>
+    </div>
+</nav>
+
+<!-- LIVESTREAM VIDEO AREA -->
+<section class="livestream-section">
+    <div class="video-container">
+        <video controls>
+            <source src="" type="video/mp4">
+            <p>Live streaming sedang tidak tersedia</p>
+        </video>
+        <div class="video-overlay">
+            <span>⚠️ LIVE STREAMING SEDANG TIDAK TERSEDIA</span>
+        </div>
+    </div>
+</section>
+
+<!-- STATISTIK / CHART AREA -->
+<section class="stats-section">
+    <div class="stats-card">
+        <h3>VOLUME KENDARAAN</h3>
+        <p class="timestamp">di update: 14:57</p>
+
+        <div class="chart-grid">
+            <div class="chart"><canvas id="motorChart"></canvas><p>Motor</p></div>
+            <div class="chart"><canvas id="mobilChart"></canvas><p>Mobil</p></div>
+            <div class="chart"><canvas id="orangChart"></canvas><p>Orang</p></div>
+            <div class="chart"><canvas id="helmChart"></canvas><p>Pengendara Helm</p></div>
+            <div class="chart"><canvas id="tanpaHelmChart"></canvas><p>Tanpa Helm</p></div>
+            <div class="chart total"><canvas id="totalChart"></canvas><p>Jumlah Total</p></div>
+        </div>
+    </div>
+
+    <div class="stats-card">
+        <h3>TOTAL VOLUME KENDARAAN HARIAN</h3>
+        <p class="timestamp">di update: 28/10/2025</p>
+
+        <div class="chart-grid">
+            <div class="chart"><canvas id="motorHarianChart"></canvas><p>Motor</p></div>
+            <div class="chart"><canvas id="mobilHarianChart"></canvas><p>Mobil</p></div>
+            <div class="chart"><canvas id="orangHarianChart"></canvas><p>Orang</p></div>
+            <div class="chart"><canvas id="helmHarianChart"></canvas><p>Pengendara Helm</p></div>
+            <div class="chart"><canvas id="tanpaHelmHarianChart"></canvas><p>Tanpa Helm</p></div>
+            <div class="chart"><canvas id="plateChart"></canvas><p>Plate</p></div>
+        </div>
+    </div>
+
+    <button class="export-btn">CETAK HASIL DETEKSI!</button>
+
+    {% include "home/components/footer.html" %}
+</section>
+
+<!-- SCRIPT UNTUK CHART.JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // ==========================
+    // Data Dummy (Simulasi)
+    // ==========================
+    const chartConfigs = [
+        { id: 'motorChart', value: 44 },
+        { id: 'mobilChart', value: 25 },
+        { id: 'orangChart', value: 24 },
+        { id: 'helmChart', value: 30 },
+        { id: 'tanpaHelmChart', value: 7 },
+        { id: 'totalChart', value: 170 },
+        { id: 'motorHarianChart', value: 26099 },
+        { id: 'mobilHarianChart', value: 13958 },
+        { id: 'orangHarianChart', value: 8608 },
+        { id: 'helmHarianChart', value: 8500 },
+        { id: 'tanpaHelmHarianChart', value: 5678 },
+        { id: 'plateChart', value: 11587 },
+    ];
+
+    // ==========================
+    // Fungsi Render Chart
+    // ==========================
+    chartConfigs.forEach(cfg => {
+        const ctx = document.getElementById(cfg.id);
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [cfg.id],
+                    datasets: [{
+                        data: [cfg.value, Math.max(cfg.value * 0.4, 1)],
+                        backgroundColor: ['#005CFF', '#e0e0e0']
+                    }]
+                },
+                options: {
+                    cutout: '75%',
+                    plugins: {
+                        tooltip: { enabled: false },
+                        legend: { display: false },
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

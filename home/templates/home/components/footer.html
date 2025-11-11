@@ -1,6 +1,24 @@
+{% load static %}
+
 <footer class="footer">
-    <div class="container">
-        <p>&copy; 2025 Traffic Eye. All rights reserved.</p>
-        <p>Real-time Traffic Monitoring System</p>
+    <div class="footer-container">
+
+        <!-- Judul -->
+        <h2 class="footer-title">TRAFFIC EYE</h2>
+
+        <!-- Informasi Kontak -->
+        <div class="footer-info">
+            <p>Jl. Ahmad Yani Batam Kota, Kota Batam, Kepulauan Riau, Indonesia</p>
+            <p>Traffic_eye@gmail.com</p>
+            <p><a href="tel:+6281234567898" class="footer-phone">+6281234567898</a></p>
+        </div>
+
+        <!-- Logo -->
+        <div class="footer-logo">
+            <img src="{% static 'home/images/logo.png' %}" alt="Traffic Eye Logo">
+        </div>
+
+        <!-- Copyright -->
+        <p class="footer-copy">© 2025 Traffic Eye. All rights reserved.</p>
     </div>
 </footer>
