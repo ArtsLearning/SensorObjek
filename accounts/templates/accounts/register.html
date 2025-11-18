@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Register</title>
+
+        {% load static %}
+
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .container {
+                width: 100vw;
+                height: 100vh;
+                display: flex;
+            }
+
+            .left {
+                width: 50%;
+                background: url("{% static 'home/images/traffic-bg.jpeg' %}");
+                background-size: cover;
+                background-position: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .left h1 {
+                color: white;
+                font-size: 40px;
+                letter-spacing: 2px;
+            }
+
+            .right {
+                width: 50%;
+                background: white;
+                border-radius: 35px 0 0 35px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .formbox {
+                width: 70%;
+            }
+
+            h2 {
+                font-weight: 900;
+                font-size: 26px;
+                margin-bottom: 20px;
+            }
+
+            label {
+                font-size: 12px;
+                font-weight: 700;
+            }
+
+            input {
+                width: 100%;
+                padding: 12px;
+                border: none;
+                margin: 10px 0 20px 0;
+                background: #e8e8e8;
+            }
+
+            button {
+                width: 100%;
+                padding: 15px;
+                background: #0d4afc;
+                color: white;
+                border: none;
+                border-radius: 30px;
+                font-weight: bold;
+                cursor: pointer;
+                margin-top: 10px;
+            }
+
+            .switchlink {
+                text-align: center;
+                margin-top: 15px;
+                display: block;
+                font-size: 13px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="left">
+                <h1>TRAFFIC<br />EYE</h1>
+            </div>
+
+            <div class="right">
+                <div class="formbox">
+                    <h2>REGISTER</h2>
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <label>USERNAME</label>
+                        <input type="text" name="username" placeholder="Masukkan Username" required />
+
+                        <label>EMAIL</label>
+                        <input type="text" name="email" placeholder="Masukkan Email" required />
+
+                        <label>PASSWORD</label>
+                        <input type="password" name="password1" placeholder="Masukkan Password" required />
+
+                        <label>CONFIRM PASSWORD</label>
+                        <input type="password" name="password2" placeholder="Masukkan Konfirmasi Password" required />
+
+                        <button type="submit">REGISTER</button>
+                    </form>
+
+                    <a class="switchlink" href="{% url 'login' %}">udah punya akun? login</a>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
