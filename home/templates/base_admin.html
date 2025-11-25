@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{% block title %}Admin - Traffic Eye{% endblock %}</title>
+</head>
+
+<body class="bg-gray-100 flex">
+
+    <!-- SIDEBAR ADMIN -->
+    <aside class="w-64 h-screen bg-blue-700 text-white p-6 fixed">
+        <div class="font-bold text-xl mb-6">TRAFFIC EYE</div>
+
+        <nav class="space-y-4 text-lg">
+            <a href="/dashboard/" class="block hover:text-gray-200">Dashboard</a>
+            <a href="/tabel/" class="block hover:text-gray-200">Tabel Pelanggaran</a>
+            <a href="/setting/" class="block hover:text-gray-200">Setting</a>
+            <a href="/logout/" class="text-red-300 hover:text-red-100">Logout</a>
+        </nav>
+    </aside>
+
+    <main class="ml-64 p-8 w-full">
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>

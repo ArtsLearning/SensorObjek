@@ -772,3 +772,8 @@ body {
         height: 220px;
     }
 }
+
+/* ================= Dashboard admin ================= */
+body {
+    font-family: 'Poppins', sans-serif;
+}
