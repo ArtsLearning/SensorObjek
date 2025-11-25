@@ -11,4 +11,9 @@ urlpatterns = [
     path('delete/<int:id>/', views.delete_pelanggaran, name='delete_pelanggaran'),
     path('export/<int:id>/', views.export_pdf, name='export_pdf'),
     path('logout/', views.logout_user, name='logout'),
+    path('setting/', views.setting_page, name='setting'),
+    path("livestream-dashboard/", views.livestream_dashboard, name="livestream_dashboard"),
+
+    
+
 ]

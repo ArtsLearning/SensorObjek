@@ -1,0 +1,94 @@
+{% extends "base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+
+<div class="space-y-10">
+
+    <!-- TITLE -->
+    <h1 class="text-2xl font-bold text-gray-700">Pengaturan Sistem</h1>
+
+    <!-- ========================= -->
+    <!-- 1. PROFILE SETTINGS -->
+    <!-- ========================= -->
+    <div class="bg-white rounded-xl shadow p-6 space-y-4">
+        <h2 class="text-xl font-semibold text-gray-700">Profil Admin</h2>
+
+        <div class="flex items-center gap-6">
+            <img src="https://randomuser.me/api/portraits/men/32.jpg"
+                 class="w-20 h-20 rounded-full border-4 border-blue-500" />
+
+            <div class="flex-1">
+                <label class="block text-sm text-gray-600 mb-1">Nama Admin</label>
+                <input type="text" value="Admin Traffic Eye"
+                       class="w-full px-4 py-2 border rounded-lg shadow-sm">
+            </div>
+
+        </div>
+
+        <button class="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
+            Simpan Perubahan
+        </button>
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- 2. SYSTEM SETTINGS -->
+    <!-- ========================= -->
+    <div class="bg-white rounded-xl shadow p-6 space-y-4">
+        <h2 class="text-xl font-semibold text-gray-700">Pengaturan Sistem</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Notifikasi -->
+            <div>
+                <label class="block text-sm text-gray-600 mb-2">Notifikasi Sistem</label>
+                <select class="w-full px-4 py-2 border rounded-lg shadow-sm">
+                    <option>Aktif</option>
+                    <option>Nonaktif</option>
+                </select>
+            </div>
+
+            <!-- Kualitas Livestream -->
+            <div>
+                <label class="block text-sm text-gray-600 mb-2">Kualitas Livestream</label>
+                <select class="w-full px-4 py-2 border rounded-lg shadow-sm">
+                    <option>720p HD</option>
+                    <option>480p SD</option>
+                    <option>360p Low</option>
+                </select>
+            </div>
+
+        </div>
+
+        <button class="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
+            Simpan Pengaturan
+        </button>
+    </div>
+
+
+
+    <!-- ========================= -->
+    <!-- 3. EXPORT DATA -->
+    <!-- ========================= -->
+    <div class="bg-white rounded-xl shadow p-6 space-y-4">
+        <h2 class="text-xl font-semibold text-gray-700">Manajemen Data</h2>
+
+        <p class="text-gray-600">Download data rekaman pelanggaran atau ekspor semua hasil.</p>
+
+        <div class="flex gap-4">
+            <button class="px-5 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700">
+                Ekspor Semua Data
+            </button>
+
+            <button class="px-5 py-2 bg-gray-700 text-white rounded-lg shadow hover:bg-gray-800">
+                Backup Sistem
+            </button>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

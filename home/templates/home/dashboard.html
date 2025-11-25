@@ -1,151 +1,178 @@
 {% extends "base_dashboard.html" %}
 {% load static %}
 
+{% block title %}Dashboard{% endblock %}
+
 {% block content %}
 
-<!-- ========================= -->
-<!-- SEARCH BAR TOP -->
-<!-- ========================= -->
-<div class="flex justify-between items-center mb-8">
-    <div class="w-full max-w-xl">
-        <input type="text" class="w-full px-4 py-2 bg-gray-200 rounded-xl" placeholder="Search...">
-    </div>
+<div class="space-y-10">
 
-    <div class="flex items-center gap-6">
-        <i class="fa fa-bell text-2xl"></i>
-        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-12 h-12 rounded-full">
-    </div>
-</div>
+    <!-- =============================== -->
+    <!-- TOP SEARCH + PROFILE -->
+    <!-- =============================== -->
+    <div class="flex justify-between items-center">
+        <input type="text"
+               placeholder="Cari data..."
+               class="px-4 py-2 w-80 rounded-xl border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500" />
 
-<!-- ========================= -->
-<!-- STAT CARDS -->
-<!-- ========================= -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-
-    <!-- Total Pelanggar -->
-    <div class="bg-white shadow rounded-xl p-6 flex items-center gap-6">
-        <i class="fa fa-users text-4xl text-blue-700"></i>
-        <div>
-            <h2 class="font-bold text-xl">12.345</h2>
-            <p class="text-gray-500">Total Pelanggar</p>
+        <div class="flex items-center gap-4">
+            <i class="fa fa-bell text-2xl text-gray-600"></i>
+            <img src="https://randomuser.me/api/portraits/men/32.jpg"
+                 class="w-12 h-12 rounded-full border-2 border-blue-500"/>
         </div>
     </div>
 
-    <!-- Plat Terdeteksi -->
-    <div class="bg-white shadow rounded-xl p-6 flex items-center gap-6">
-        <div class="w-12 h-12 bg-blue-700 rounded-xl"></div>
-        <div>
-            <h2 class="font-bold text-xl">12.345</h2>
-            <p class="text-gray-500">Plat Terdeteksi</p>
+    <!-- =============================== -->
+    <!-- TOP STAT CARDS -->
+    <!-- =============================== -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+        <!-- Motor -->
+        <div class="bg-white shadow rounded-xl p-6 flex items-center gap-4">
+            <i class="fa fa-motorcycle text-3xl text-blue-700"></i>
+            <div>
+                <h2 class="text-xl font-bold">4.587</h2>
+                <p class="text-gray-500">Motor Hari Ini</p>
+            </div>
         </div>
+
+        <!-- Mobil -->
+        <div class="bg-white shadow rounded-xl p-6 flex items-center gap-4">
+            <i class="fa fa-car text-3xl text-blue-700"></i>
+            <div>
+                <h2 class="text-xl font-bold">2.199</h2>
+                <p class="text-gray-500">Mobil Hari Ini</p>
+            </div>
+        </div>
+
+        <!-- Pelanggar -->
+        <div class="bg-white shadow rounded-xl p-6 flex items-center gap-4">
+            <i class="fa fa-user-times text-3xl text-red-600"></i>
+            <div>
+                <h2 class="text-xl font-bold">145</h2>
+                <p class="text-gray-500">Pelanggar Hari Ini</p>
+            </div>
+        </div>
+
+        <!-- Total Kendaraan -->
+        <div class="bg-white shadow rounded-xl p-6 flex items-center gap-4">
+            <i class="fa fa-road text-3xl text-green-600"></i>
+            <div>
+                <h2 class="text-xl font-bold">6.986</h2>
+                <p class="text-gray-500">Total Kendaraan</p>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Donut Chart -->
+    <!-- =============================== -->
+    <!-- CHARTS -->
+    <!-- =============================== -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Donut Chart -->
+        <div class="bg-white shadow rounded-xl p-6">
+            <h3 class="font-semibold mb-4 text-gray-700">Rasio Kendaraan</h3>
+            <canvas id="donutChart"></canvas>
+        </div>
+
+        <!-- Line Chart -->
+        <div class="md:col-span-2 bg-white shadow rounded-xl p-6">
+            <h3 class="font-semibold mb-4 text-gray-700">Trend Total Kendaraan Per Bulan</h3>
+            <canvas id="lineChart"></canvas>
+        </div>
+
+    </div>
+
+    <!-- =============================== -->
+    <!-- DATA TABLE -->
+    <!-- =============================== -->
     <div class="bg-white shadow rounded-xl p-6">
-        <canvas id="donutChart"></canvas>
+        <h2 class="text-xl font-bold mb-4">Data Pelanggaran Terbaru</h2>
+
+        <table class="w-full text-left">
+            <thead class="border-b bg-gray-50">
+                <tr>
+                    <th class="p-3">ID</th>
+                    <th class="p-3">Nomor Plat</th>
+                    <th class="p-3">Tanggal</th>
+                    <th class="p-3">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for n in "12345"|make_list %}
+                <tr class="border-b hover:bg-gray-100 transition">
+                    <td class="p-3 font-semibold">#00{{ forloop.counter }}</td>
+                    <td class="p-3">BP 1234 AC</td>
+                    <td class="p-3">27-10-2025</td>
+                    <td class="p-3 flex gap-4">
+                        <i class="fa fa-eye text-blue-600 cursor-pointer"></i>
+                        <i class="fa fa-pen text-yellow-600 cursor-pointer"></i>
+                        <i class="fa fa-trash text-red-600 cursor-pointer"></i>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
     </div>
 
 </div>
 
-<!-- ========================= -->
-<!-- LINE CHART -->
-<!-- ========================= -->
-<div class="bg-white p-6 shadow rounded-xl mb-10">
-    <canvas id="lineChart"></canvas>
-</div>
 
-<!-- ========================= -->
-<!-- TABLE SECTION -->
-<!-- ========================= -->
-<div id="data-pelanggaran" class="bg-white p-6 shadow rounded-xl mb-10">
-
-    <div class="flex justify-between mb-4">
-        <h2 class="font-bold text-xl">DATA PELANGGARAN</h2>
-        <a href="#" class="text-blue-600">Lihat semua</a>
-    </div>
-
-    <table class="w-full text-left">
-        <thead>
-            <tr class="border-b">
-                <th class="p-3">ID</th>
-                <th class="p-3">Nomor Plat</th>
-                <th class="p-3">Tanggal</th>
-                <th class="p-3">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for i in "12345" %}
-            <tr class="border-b hover:bg-gray-100">
-                <td class="p-3">1</td>
-                <td class="p-3">BP 1234 AC</td>
-                <td class="p-3">27 - 10 - 2025</td>
-                <td class="p-3 flex gap-4">
-                    <i class="fa fa-trash text-red-500 cursor-pointer"></i>
-                    <i class="fa fa-pen text-blue-500 cursor-pointer"></i>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-</div>
-
-<!-- ========================= -->
-<!-- CHART.JS SCRIPTS -->
-<!-- ========================= -->
+<!-- =============================== -->
+<!-- CHART JS SCRIPT -->
+<!-- =============================== -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // DONUT CHART
-    new Chart(document.getElementById('donutChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Data'],
-            datasets: [{
-                data: [80, 20],
-                borderWidth: 0,
-                backgroundColor: ['#2563eb', '#e5e7eb']
-            }]
-        },
-        options: {
-            cutout: '70%',
-            plugins: {
-                legend: { display: false }
+/* ======================= */
+/* DONUT CHART */
+/* ======================= */
+new Chart(document.getElementById("donutChart"), {
+    type: "doughnut",
+    data: {
+        labels: ["Motor", "Mobil", "Pelanggar"],
+        datasets: [{
+            data: [4587, 2199, 145],
+            backgroundColor: ["#2563eb", "#38bdf8", "#ef4444"],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        cutout: "65%",
+        plugins: { 
+            legend: { position: "bottom" } 
+        }
+    }
+});
+
+
+/* ======================= */
+/* LINE CHART */
+/* ======================= */
+new Chart(document.getElementById("lineChart"), {
+    type: "line",
+    data: {
+        labels: ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu"],
+        datasets: [{
+            label: "Total Kendaraan",
+            data: [5000, 6400, 5800, 7200, 6900, 7500, 8000, 8600],
+            borderColor: "#2563eb",
+            backgroundColor: "#2563eb40",
+            tension: 0.3,
+            fill: true
+        }]
+    },
+    options: {
+        plugins: { legend: { position: "bottom" }},
+        scales: {
+            y: {
+                beginAtZero: true
             }
         }
-    });
-
-    // LINE CHART
-    new Chart(document.getElementById('lineChart'), {
-        type: 'line',
-        data: {
-            labels: ["Figma", "Sketch", "XD", "PS", "AI", "Corel", "InDesign", "Canva", "Webflow", "Affinity", "Figma"],
-            datasets: [
-                { 
-                    label: "2020", 
-                    data: [60,80,40,90,70,85,45,60,75,40,80], 
-                    borderColor: "#2563eb",
-                    fill: false 
-                },
-                { 
-                    label: "2021", 
-                    data: [50,70,65,80,60,75,55,65,85,50,70], 
-                    borderColor: "#1d4ed8",
-                    fill: false 
-                },
-                { 
-                    label: "2022", 
-                    data: [40,60,55,70,50,65,45,55,75,45,60], 
-                    borderColor: "#93c5fd",
-                    fill: false 
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { position: 'bottom' } }
-        }
-    });
+    }
+});
 </script>
 
 {% endblock %}

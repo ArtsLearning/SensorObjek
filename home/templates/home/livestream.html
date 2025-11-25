@@ -4,6 +4,7 @@
 {% block title %}LiveStream - Traffic Eye{% endblock %}
 
 {% block content %}
+
 <!-- LIVESTREAM NAVBAR -->
 <nav class="livestream-navbar">
     <div class="livestream-navbar-container">
@@ -33,6 +34,8 @@
 
 <!-- STATISTIK / CHART AREA -->
 <section class="stats-section">
+
+    <!-- ============ KARTU 1: VOLUME KENDARAAN SEKARANG ============ -->
     <div class="stats-card">
         <h3>VOLUME KENDARAAN</h3>
         <p class="timestamp">di update: 14:57</p>
@@ -40,13 +43,12 @@
         <div class="chart-grid">
             <div class="chart"><canvas id="motorChart"></canvas><p>Motor</p></div>
             <div class="chart"><canvas id="mobilChart"></canvas><p>Mobil</p></div>
-            <div class="chart"><canvas id="orangChart"></canvas><p>Orang</p></div>
-            <div class="chart"><canvas id="helmChart"></canvas><p>Pengendara Helm</p></div>
-            <div class="chart"><canvas id="tanpaHelmChart"></canvas><p>Tanpa Helm</p></div>
-            <div class="chart total"><canvas id="totalChart"></canvas><p>Jumlah Total</p></div>
+            <div class="chart"><canvas id="pelanggarChart"></canvas><p>Pelanggar</p></div>
+            <div class="chart"><canvas id="totalChart"></canvas><p>Total</p></div>
         </div>
     </div>
 
+    <!-- ============ KARTU 2: TOTAL HARIAN ============ -->
     <div class="stats-card">
         <h3>TOTAL VOLUME KENDARAAN HARIAN</h3>
         <p class="timestamp">di update: 28/10/2025</p>
@@ -54,44 +56,44 @@
         <div class="chart-grid">
             <div class="chart"><canvas id="motorHarianChart"></canvas><p>Motor</p></div>
             <div class="chart"><canvas id="mobilHarianChart"></canvas><p>Mobil</p></div>
-            <div class="chart"><canvas id="orangHarianChart"></canvas><p>Orang</p></div>
-            <div class="chart"><canvas id="helmHarianChart"></canvas><p>Pengendara Helm</p></div>
-            <div class="chart"><canvas id="tanpaHelmHarianChart"></canvas><p>Tanpa Helm</p></div>
-            <div class="chart"><canvas id="plateChart"></canvas><p>Plate</p></div>
+            <div class="chart"><canvas id="pelanggarHarianChart"></canvas><p>Pelanggar</p></div>
+            <div class="chart"><canvas id="totalHarianChart"></canvas><p>Total</p></div>
         </div>
     </div>
 
     <button class="export-btn">CETAK HASIL DETEKSI!</button>
 
     {% include "home/components/footer.html" %}
+
 </section>
 
 <!-- SCRIPT UNTUK CHART.JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
     // ==========================
-    // Data Dummy (Simulasi)
+    // Data Dummy
     // ==========================
     const chartConfigs = [
+        // —————— LIVE ——————
         { id: 'motorChart', value: 44 },
         { id: 'mobilChart', value: 25 },
-        { id: 'orangChart', value: 24 },
-        { id: 'helmChart', value: 30 },
-        { id: 'tanpaHelmChart', value: 7 },
+        { id: 'pelanggarChart', value: 7 },  // pelanggar
         { id: 'totalChart', value: 170 },
+
+        // —————— HARIAN ——————
         { id: 'motorHarianChart', value: 26099 },
         { id: 'mobilHarianChart', value: 13958 },
-        { id: 'orangHarianChart', value: 8608 },
-        { id: 'helmHarianChart', value: 8500 },
-        { id: 'tanpaHelmHarianChart', value: 5678 },
-        { id: 'plateChart', value: 11587 },
+        { id: 'pelanggarHarianChart', value: 5678 },
+        { id: 'totalHarianChart', value: 50000 },
     ];
 
     // ==========================
-    // Fungsi Render Chart
+    // Render Chart
     // ==========================
     chartConfigs.forEach(cfg => {
         const ctx = document.getElementById(cfg.id);
+
         if (ctx) {
             new Chart(ctx, {
                 type: 'doughnut',
@@ -99,18 +101,20 @@
                     labels: [cfg.id],
                     datasets: [{
                         data: [cfg.value, Math.max(cfg.value * 0.4, 1)],
-                        backgroundColor: ['#005CFF', '#e0e0e0']
+                        backgroundColor: ['#005CFF', '#e0e0e0'],
+                        borderWidth: 0
                     }]
                 },
                 options: {
                     cutout: '75%',
                     plugins: {
-                        tooltip: { enabled: false },
                         legend: { display: false },
+                        tooltip: { enabled: false }
                     }
                 }
             });
         }
     });
 </script>
+
 {% endblock %}

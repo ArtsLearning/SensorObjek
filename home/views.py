@@ -62,6 +62,14 @@ def logout_user(request):
     logout(request)
     return redirect('home')
 
+def setting_page(request):
+    return render(request, 'home/settings_admin.html')
+
+def livestream_dashboard(request):
+    return render(request, "home/livestream_dashboard.html")
+
+
+
 
 
 # ===============================

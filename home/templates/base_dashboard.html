@@ -1,91 +1,69 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>{% block title %}Traffic Eye Dashboard{% endblock %}</title>
+    <title>{% block title %}Dashboard{% endblock %}</title>
 
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'home/style.css' %}">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <style>
-        html { scroll-behavior: smooth; }
-        .nav-item-active {
-            font-weight: bold;
-            color: #ffffff !important;
-            background-color: rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            padding: 8px 12px;
+        html, body {
+            overflow-x: hidden;
+            background: #f3f4f6;
         }
     </style>
 </head>
 
-<body class="bg-gray-100">
-
-<div class="flex">
+<body class="flex">
 
     <!-- SIDEBAR -->
-    <aside class="w-64 h-screen bg-blue-700 text-white p-6 fixed left-0 top-0 shadow-xl">
+    <aside class="w-64 h-screen bg-blue-700 text-white p-6 fixed left-0 top-0 shadow-lg">
 
-        <!-- LOGO -->
-        <div class="flex items-center gap-3 mb-10">
-            <img src="{% static 'home/images/logo.png' %}" class="w-10">
-            <h1 class="text-xl font-bold tracking-wide">TRAFFIC EYE</h1>
-        </div>
+        <h1 class="text-2xl font-bold mb-10">TRAFFIC EYE</h1>
 
-        <!-- NAVIGATION MENU -->
-        <nav class="space-y-3 text-lg">
+        <nav class="space-y-4 text-lg">
 
             <!-- Dashboard -->
-            <a href="{% url 'dashboard' %}"
-               class="flex items-center gap-3 hover:text-gray-300 transition
-               {% if request.path == '/dashboard/' %}nav-item-active{% endif %}">
-                <i class="fa fa-home text-white"></i> Dashboard
+            <a href="{% url 'dashboard' %}" class="block hover:text-gray-200">
+                Dashboard
             </a>
 
             <!-- Tabel Pelanggaran -->
-            <a href="{% url 'tabel_pelanggaran' %}"
-               class="flex items-center gap-3 hover:text-gray-300 transition
-               {% if request.path == '/tabel/' %}nav-item-active{% endif %}">
-                <i class="fa fa-table text-white"></i> Tabel Pelanggaran
+            <a href="{% url 'tabel_pelanggaran' %}" class="block hover:text-gray-200">
+                Tabel Pelanggaran
             </a>
 
-            <!-- Livestream Admin -->
-            <a href="/admin/livestream/"
-               class="flex items-center gap-3 hover:text-gray-300 transition
-               {% if request.path == '/admin/livestream/' %}nav-item-active{% endif %}">
-                <i class="fa fa-video text-white"></i> Livestream
-            </a>
+            <!-- Livestream -->
+            <a href="{% url 'livestream_dashboard' %}" class="block hover:text-gray-200">Livestream</a>
 
-            <!-- Setting -->
-            <a href="/setting/"
-               class="flex items-center gap-3 hover:text-gray-300 transition">
-                <i class="fa fa-gear text-white"></i> Setting
+            <!-- Setting (nanti bisa diganti ke url valid) -->
+            <a href="/setting/" class="block hover:text-gray-200">
+                Setting
             </a>
 
             <!-- Logout -->
-            <a href="{% url 'logout' %}" class="flex items-center gap-3 text-red-300 hover:text-red-500 mt-6">
-                <i class="fa fa-sign-out-alt"></i> Logout
+            <a href="{% url 'logout' %}"
+               class="block text-red-300 hover:text-red-500 mt-8">
+               Logout
             </a>
-
         </nav>
+
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 ml-64 p-6">
+    <main class="ml-64 w-full p-6">
         {% block content %}
         {% endblock %}
     </main>
-
-</div>
 
 </body>
 </html>

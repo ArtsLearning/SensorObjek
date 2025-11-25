@@ -1,0 +1,138 @@
+{% extends "base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Livestream Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="space-y-10">
+
+    <!-- Judul -->
+    <h1 class="text-3xl font-bold mb-6">Halaman Livestream</h1>
+
+    <!-- ====================================== -->
+    <!-- LIVE STREAM VIDEO SECTION -->
+    <!-- ====================================== -->
+    <div class="bg-white shadow rounded-xl p-6">
+        <h2 class="font-semibold text-gray-700 mb-4">Live Streaming</h2>
+
+        <div class="w-full">
+            <video controls class="w-full h-[430px] rounded-xl bg-black shadow-inner">
+                <source src="" type="video/mp4">
+            </video>
+
+            <p class="text-red-600 font-semibold text-center mt-3">
+                ⚠ LIVE STREAMING SEDANG TIDAK TERSEDIA
+            </p>
+        </div>
+    </div>
+
+    <!-- ====================================== -->
+    <!-- REALTIME CHART -->
+    <!-- ====================================== -->
+    <div class="bg-white shadow rounded-xl p-6">
+        <h2 class="font-semibold text-gray-700 mb-4">Volume Kendaraan (Realtime)</h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 place-items-center">
+
+            <div class="flex flex-col items-center">
+                <canvas id="motorChart" class="w-28 h-28"></canvas>
+                <p class="mt-2 font-semibold">Motor</p>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <canvas id="mobilChart" class="w-28 h-28"></canvas>
+                <p class="mt-2 font-semibold">Mobil</p>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <canvas id="pelanggarChart" class="w-28 h-28"></canvas>
+                <p class="mt-2 font-semibold">Pelanggar</p>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <canvas id="totalChart" class="w-28 h-28"></canvas>
+                <p class="mt-2 font-semibold">Total Kendaraan</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ====================================== -->
+    <!-- DAILY CHART -->
+    <!-- ====================================== -->
+    <div class="bg-white shadow rounded-xl p-6">
+        <h2 class="font-semibold text-gray-700 mb-4">Total Volume Kendaraan Hari Ini</h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 place-items-center">
+
+            <div class="flex flex-col items-center">
+                <canvas id="motorHarianChart" class="w-28 h-28"></canvas>
+                <p class="mt-2 font-semibold">Motor</p>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <canvas id="mobilHarianChart" class="w-28 h-28"></canvas>
+                <p class="mt-2 font-semibold">Mobil</p>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <canvas id="pelanggarHarianChart" class="w-28 h-28"></canvas>
+                <p class="mt-2 font-semibold">Pelanggar</p>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <canvas id="totalHarianChart" class="w-28 h-28"></canvas>
+                <p class="mt-2 font-semibold">Total Kendaraan</p>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- ====================================== -->
+<!-- CHART.JS -->
+<!-- ====================================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+/* CHART CONFIG LIST */
+const chartConfigs = [
+    { id: 'motorChart', value: 44 },
+    { id: 'mobilChart', value: 25 },
+    { id: 'pelanggarChart', value: 7 },
+    { id: 'totalChart', value: 170 },
+
+    { id: 'motorHarianChart', value: 26099 },
+    { id: 'mobilHarianChart', value: 13958 },
+    { id: 'pelanggarHarianChart', value: 5678 },
+    { id: 'totalHarianChart', value: 50000 },
+];
+
+/* RENDER CHART */
+chartConfigs.forEach(cfg => {
+    const ctx = document.getElementById(cfg.id);
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [cfg.value, Math.max(cfg.value * 0.35, 1)],
+                    backgroundColor: ["#2563eb", "#e5e7eb"],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: "72%",
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}
