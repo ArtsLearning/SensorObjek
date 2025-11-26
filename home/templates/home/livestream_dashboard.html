@@ -14,14 +14,21 @@
     <!-- =============================== -->
     <div class="bg-white shadow rounded-xl p-6">
         <h2 class="font-semibold text-gray-700 mb-4">Live Streaming</h2>
-        <div class="w-full">
-            <video controls class="w-full h-[430px] rounded-xl bg-black shadow-inner">
-                <source src="" type="video/mp4">
-            </video>
-            <p id="livestream-status" class="text-red-600 font-semibold text-center mt-3">
-                ⚠ LIVE STREAMING SEDANG TIDAK TERSEDIA
-            </p>
+
+        <!-- Responsive Video Wrapper -->
+        <div class="relative w-full pb-[56.25%] rounded-xl overflow-hidden shadow bg-black">
+            <iframe
+                id="webrtc-frame"
+                src="http://127.0.0.1:8889/traffic?video=webrtc"
+                class="absolute top-0 left-0 w-full h-full"
+                frameborder="0"
+                allow="autoplay; fullscreen">
+            </iframe>
         </div>
+
+        <p id="livestream-status" class="text-red-600 font-semibold text-center mt-3">
+            ⚠ LIVE STREAMING SEDANG TIDAK TERSEDIA
+        </p>
     </div>
 
     <!-- =============================== -->
@@ -75,6 +82,7 @@
             </div>
         </div>
     </div>
+
 </div>
 
 <!-- =============================== -->
@@ -125,17 +133,19 @@ chartList.forEach(cfg => {
 let lastUpdate = 0;
 function updateCharts(data) {
     const now = Date.now();
-    if (now - lastUpdate < 1000) return;  // update max tiap 1 detik
+    if (now - lastUpdate < 1000) return;
     lastUpdate = now;
 
     for (const key of ['motor', 'mobil', 'pelanggar', 'total']) {
         const chartId = key + 'Chart';
         const chart = window.liveCharts[chartId];
+
         if (chart) {
             const value = data[key] || 0;
             chart.data.datasets[0].data = [value, 100 - (value % 100)];
             chart.update('none');
         }
+
         const span = document.getElementById(`${key}-count`);
         if (span) span.textContent = data[key] || 0;
     }

@@ -22,39 +22,60 @@
 <!-- LIVESTREAM VIDEO AREA -->
 <section class="livestream-section">
     <div class="video-container">
-        <video controls>
-            <source src="" type="video/mp4">
-            <p>Live streaming sedang tidak tersedia</p>
-        </video>
+
+        <div class="video-wrapper">
+            <iframe 
+                id="webrtc-frame"
+                src="http://127.0.0.1:8889/traffic?video=webrtc"
+                class="video-iframe"
+                frameborder="0"
+                allow="autoplay; fullscreen"
+                allowfullscreen
+                webkitallowfullscreen
+                mozallowfullscreen>
+            </iframe>
+
+            <!-- Tombol Fullscreen (berfungsi) -->
+            <button class="fullscreen-btn" onclick="toggleFullscreen()">
+                ⛶
+            </button>
+        </div>
+
         <div class="video-overlay">
             <span id="livestream-status" class="text-red-600 font-semibold">
-                ⚠ LIVE STREAMING SEDANG TIDAK TERSEDIA
+                
             </span>
         </div>
+
     </div>
 </section>
 
-<!-- STATISTIK / CHART AREA -->
+<!-- ========================== -->
+<!--     STATISTIK CHARTS       -->
+<!-- ========================== -->
 <section class="stats-section">
 
-    <!-- ============ KARTU 1: VOLUME KENDARAAN SEKARANG ============ -->
+    <!-- REALTIME -->
     <div class="stats-card">
         <h3>VOLUME KENDARAAN (REALTIME)</h3>
-        <p class="timestamp">di update: <span id="last-update">-</span></p>
+        <p class="timestamp">di update: <span id="last-update">Belum ada update</span></p>
 
         <div class="chart-grid">
             <div class="chart">
                 <canvas id="motorChart"></canvas>
                 <p>Motor: <span id="motor-count">0</span></p>
             </div>
+
             <div class="chart">
                 <canvas id="mobilChart"></canvas>
                 <p>Mobil: <span id="mobil-count">0</span></p>
             </div>
+
             <div class="chart">
                 <canvas id="pelanggarChart"></canvas>
                 <p>Pelanggar: <span id="pelanggar-count">0</span></p>
             </div>
+
             <div class="chart">
                 <canvas id="totalChart"></canvas>
                 <p>Total: <span id="total-count">0</span></p>
@@ -62,7 +83,7 @@
         </div>
     </div>
 
-    <!-- ============ KARTU 2: TOTAL HARIAN ============ -->
+    <!-- HARIAN -->
     <div class="stats-card">
         <h3>TOTAL VOLUME KENDARAAN HARIAN</h3>
         <p class="timestamp">di update: 28/10/2025</p>
@@ -78,18 +99,16 @@
     <button class="export-btn">CETAK HASIL DETEKSI!</button>
 
     {% include "home/components/footer.html" %}
-
 </section>
 
-<!-- =============================== -->
-<!-- CHART.JS -->
-<!-- =============================== -->
+
+<!-- CHART JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-/* ===============================
-   Inisialisasi chart realtime
-=============================== */
+/* ============================
+   CHART REALTIME (ASLI, TIDAK DIUBAH)
+============================ */
 const chartList = [
     { id: 'motorChart', color: '#2563eb' },
     { id: 'mobilChart', color: '#38bdf8' },
@@ -97,7 +116,7 @@ const chartList = [
     { id: 'totalChart', color: '#22c55e' }
 ];
 
-window.liveCharts = {}; // simpan semua chart agar bisa di-update
+window.liveCharts = {};
 
 chartList.forEach(cfg => {
     const ctx = document.getElementById(cfg.id);
@@ -105,53 +124,83 @@ chartList.forEach(cfg => {
         window.liveCharts[cfg.id] = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: [cfg.id],
                 datasets: [{
-                    data: [0, 100], // nilai awal dummy
+                    data: [0, 100],
                     backgroundColor: [cfg.color, '#e5e7eb'],
                     borderWidth: 0
                 }]
             },
             options: {
                 cutout: '75%',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { enabled: false }
-                }
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
             }
         });
     }
 });
 
-/* ===============================
-   Fungsi untuk update realtime
-=============================== */
+/* ============================
+   CHART HARIAN (PERBAIKAN)
+============================ */
+const dailyCharts = [
+    { id: 'motorHarianChart', color: '#2563eb' },
+    { id: 'mobilHarianChart', color: '#38bdf8' },
+    { id: 'pelanggarHarianChart', color: '#ef4444' },
+    { id: 'totalHarianChart', color: '#22c55e' }
+];
+
+dailyCharts.forEach(cfg => {
+    const ctx = document.getElementById(cfg.id);
+    if (ctx) {
+        window.liveCharts[cfg.id] = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [0, 100],
+                    backgroundColor: [cfg.color, '#e5e7eb'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '75%',
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            }
+        });
+    }
+});
+
+
+/* ============================
+   UPDATE REALTIME DATA
+============================ */
 function updateCharts(data) {
-    // update donut chart realtime
+
     if (window.liveCharts['motorChart']) {
         window.liveCharts['motorChart'].data.datasets[0].data = [data.motor, 100 - data.motor % 100];
         window.liveCharts['motorChart'].update();
     }
+
     if (window.liveCharts['mobilChart']) {
         window.liveCharts['mobilChart'].data.datasets[0].data = [data.mobil, 100 - data.mobil % 100];
         window.liveCharts['mobilChart'].update();
     }
+
     if (window.liveCharts['pelanggarChart']) {
         window.liveCharts['pelanggarChart'].data.datasets[0].data = [data.pelanggar, 100 - data.pelanggar % 100];
         window.liveCharts['pelanggarChart'].update();
     }
+
     if (window.liveCharts['totalChart']) {
         window.liveCharts['totalChart'].data.datasets[0].data = [data.total, 100 - data.total % 100];
         window.liveCharts['totalChart'].update();
     }
 }
 
-/* ===============================
-   Fungsi update status video
-=============================== */
+
+/* ============================
+   STATUS LIVESTREAM
+============================ */
 function updateLivestreamStatus(data) {
     const el = document.getElementById("livestream-status");
-    if (!el) return;
 
     if (data.stream_active) {
         el.textContent = "✅ Live Streaming Aktif";
@@ -163,11 +212,59 @@ function updateLivestreamStatus(data) {
         el.classList.add("text-red-600");
     }
 }
+
+
+/* ============================
+   FULLSCREEN BUTTON FIX
+============================ */
+function toggleFullscreen() {
+    const iframe = document.getElementById("webrtc-frame");
+
+    if (iframe.requestFullscreen) iframe.requestFullscreen();
+    else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+    else if (iframe.mozRequestFullScreen) iframe.mozRequestFullScreen();
+    else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
+}
+
 </script>
 
-<!-- =============================== -->
-<!-- GLOBAL REALTIME JS -->
-<!-- =============================== -->
 <script src="{% static 'js/realtime.js' %}"></script>
+
+
+<!-- ============================
+   STYLE LIVESTREAM (PERBAIKAN)
+============================ -->
+<style>
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    background: black;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.video-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.fullscreen-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.6);
+    padding: 8px 14px;
+    border-radius: 6px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    border: 1px solid white;
+    z-index: 50;
+}
+</style>
 
 {% endblock %}
