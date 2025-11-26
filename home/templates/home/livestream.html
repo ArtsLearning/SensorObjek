@@ -27,7 +27,9 @@
             <p>Live streaming sedang tidak tersedia</p>
         </video>
         <div class="video-overlay">
-            <span>⚠ LIVE STREAMING SEDANG TIDAK TERSEDIA</span>
+            <span id="livestream-status" class="text-red-600 font-semibold">
+                ⚠ LIVE STREAMING SEDANG TIDAK TERSEDIA
+            </span>
         </div>
     </div>
 </section>
@@ -37,14 +39,26 @@
 
     <!-- ============ KARTU 1: VOLUME KENDARAAN SEKARANG ============ -->
     <div class="stats-card">
-        <h3>VOLUME KENDARAAN</h3>
-        <p class="timestamp">di update: 14:57</p>
+        <h3>VOLUME KENDARAAN (REALTIME)</h3>
+        <p class="timestamp">di update: <span id="last-update">-</span></p>
 
         <div class="chart-grid">
-            <div class="chart"><canvas id="motorChart"></canvas><p>Motor</p></div>
-            <div class="chart"><canvas id="mobilChart"></canvas><p>Mobil</p></div>
-            <div class="chart"><canvas id="pelanggarChart"></canvas><p>Pelanggar</p></div>
-            <div class="chart"><canvas id="totalChart"></canvas><p>Total</p></div>
+            <div class="chart">
+                <canvas id="motorChart"></canvas>
+                <p>Motor: <span id="motor-count">0</span></p>
+            </div>
+            <div class="chart">
+                <canvas id="mobilChart"></canvas>
+                <p>Mobil: <span id="mobil-count">0</span></p>
+            </div>
+            <div class="chart">
+                <canvas id="pelanggarChart"></canvas>
+                <p>Pelanggar: <span id="pelanggar-count">0</span></p>
+            </div>
+            <div class="chart">
+                <canvas id="totalChart"></canvas>
+                <p>Total: <span id="total-count">0</span></p>
+            </div>
         </div>
     </div>
 
@@ -67,54 +81,93 @@
 
 </section>
 
-<!-- SCRIPT UNTUK CHART.JS -->
+<!-- =============================== -->
+<!-- CHART.JS -->
+<!-- =============================== -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // ==========================
-    // Data Dummy
-    // ==========================
-    const chartConfigs = [
-        // —————— LIVE ——————
-        { id: 'motorChart', value: 44 },
-        { id: 'mobilChart', value: 25 },
-        { id: 'pelanggarChart', value: 7 },  // pelanggar
-        { id: 'totalChart', value: 170 },
+/* ===============================
+   Inisialisasi chart realtime
+=============================== */
+const chartList = [
+    { id: 'motorChart', color: '#2563eb' },
+    { id: 'mobilChart', color: '#38bdf8' },
+    { id: 'pelanggarChart', color: '#ef4444' },
+    { id: 'totalChart', color: '#22c55e' }
+];
 
-        // —————— HARIAN ——————
-        { id: 'motorHarianChart', value: 26099 },
-        { id: 'mobilHarianChart', value: 13958 },
-        { id: 'pelanggarHarianChart', value: 5678 },
-        { id: 'totalHarianChart', value: 50000 },
-    ];
+window.liveCharts = {}; // simpan semua chart agar bisa di-update
 
-    // ==========================
-    // Render Chart
-    // ==========================
-    chartConfigs.forEach(cfg => {
-        const ctx = document.getElementById(cfg.id);
-
-        if (ctx) {
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: [cfg.id],
-                    datasets: [{
-                        data: [cfg.value, Math.max(cfg.value * 0.4, 1)],
-                        backgroundColor: ['#005CFF', '#e0e0e0'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    cutout: '75%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                    }
+chartList.forEach(cfg => {
+    const ctx = document.getElementById(cfg.id);
+    if (ctx) {
+        window.liveCharts[cfg.id] = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: [cfg.id],
+                datasets: [{
+                    data: [0, 100], // nilai awal dummy
+                    backgroundColor: [cfg.color, '#e5e7eb'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '75%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
                 }
-            });
-        }
-    });
+            }
+        });
+    }
+});
+
+/* ===============================
+   Fungsi untuk update realtime
+=============================== */
+function updateCharts(data) {
+    // update donut chart realtime
+    if (window.liveCharts['motorChart']) {
+        window.liveCharts['motorChart'].data.datasets[0].data = [data.motor, 100 - data.motor % 100];
+        window.liveCharts['motorChart'].update();
+    }
+    if (window.liveCharts['mobilChart']) {
+        window.liveCharts['mobilChart'].data.datasets[0].data = [data.mobil, 100 - data.mobil % 100];
+        window.liveCharts['mobilChart'].update();
+    }
+    if (window.liveCharts['pelanggarChart']) {
+        window.liveCharts['pelanggarChart'].data.datasets[0].data = [data.pelanggar, 100 - data.pelanggar % 100];
+        window.liveCharts['pelanggarChart'].update();
+    }
+    if (window.liveCharts['totalChart']) {
+        window.liveCharts['totalChart'].data.datasets[0].data = [data.total, 100 - data.total % 100];
+        window.liveCharts['totalChart'].update();
+    }
+}
+
+/* ===============================
+   Fungsi update status video
+=============================== */
+function updateLivestreamStatus(data) {
+    const el = document.getElementById("livestream-status");
+    if (!el) return;
+
+    if (data.stream_active) {
+        el.textContent = "✅ Live Streaming Aktif";
+        el.classList.remove("text-red-600");
+        el.classList.add("text-green-600");
+    } else {
+        el.textContent = "⚠ LIVE STREAMING SEDANG TIDAK TERSEDIA";
+        el.classList.remove("text-green-600");
+        el.classList.add("text-red-600");
+    }
+}
 </script>
+
+<!-- =============================== -->
+<!-- GLOBAL REALTIME JS -->
+<!-- =============================== -->
+<script src="{% static 'js/realtime.js' %}"></script>
 
 {% endblock %}
