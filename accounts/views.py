@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import RegisterForm
 
-def register_view(request):
+def register(request):
     form = RegisterForm()
 
     if request.method == 'POST':
@@ -29,7 +29,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, "Login berhasil! Selamat datang.")
-            return redirect('home')
+            return redirect('dashboard')
 
         else:
             messages.error(request, "Username atau password salah!")
