@@ -42,10 +42,17 @@ def livestream(request):
 
 
 # ================================================================
-# DASHBOARD ADMIN
+# DASHBOARD ADMIN  (✔ Diperbaiki)
 # ================================================================
 def dashboard(request):
-    return render(request, 'home/dashboard.html')
+    """
+    Dashboard admin butuh data 5 pelanggaran terbaru.
+    """
+    pelanggaran_terbaru = Pelanggaran.objects.order_by('-id')[:5]
+
+    return render(request, 'home/dashboard.html', {
+        "pelanggaran_terbaru": pelanggaran_terbaru
+    })
 
 
 # ================================================================
@@ -63,10 +70,10 @@ def setting_page(request):
 
 
 # ================================================================
-# TABEL PELANGGARAN
+# TABEL PELANGGARAN (FULL DATA)
 # ================================================================
 def tabel_pelanggaran(request):
-    data = Pelanggaran.objects.all().order_by('-id')  # data terbaru di atas
+    data = Pelanggaran.objects.all().order_by('-id')
     return render(request, 'home/tabel_pelanggaran.html', {'data': data})
 
 
@@ -76,14 +83,15 @@ def tabel_pelanggaran(request):
 def delete_pelanggaran(request, id):
     pelanggaran = get_object_or_404(Pelanggaran, id=id)
 
-    # Hapus foto bukti
+    # Hapus file foto
     if pelanggaran.bukti_foto:
-        if os.path.isfile(pelanggaran.bukti_foto.path):
-            os.remove(pelanggaran.bukti_foto.path)
+        try:
+            if os.path.isfile(pelanggaran.bukti_foto.path):
+                os.remove(pelanggaran.bukti_foto.path)
+        except:
+            pass
 
-    # Hapus data DB
     pelanggaran.delete()
-
     return redirect('tabel_pelanggaran')
 
 
@@ -96,7 +104,7 @@ def logout_user(request):
 
 
 # ================================================================
-# EXPORT PDF LAPORAN PELANGGARAN
+# EXPORT PDF
 # ================================================================
 def export_pdf(request, id):
     pelanggaran = get_object_or_404(Pelanggaran, id=id)
@@ -129,28 +137,16 @@ def export_pdf(request, id):
 
 
 # ================================================================
-# ENDPOINT UNTUK YOLO — MENERIMA DATA (POST)
+# API — MENERIMA DATA YOLO (POST)
 # ================================================================
 @csrf_exempt
 def yolo_test(request):
-    """
-    Endpoint untuk menerima data dari YOLO.
-    Format JSON:
-    {
-        "motor": 5,
-        "mobil": 3,
-        "pelanggar": 1,
-        "total": 9,
-        "stream_active": true
-    }
-    """
     global YOLO_DATA
 
     if request.method == "POST":
         try:
             data = json.loads(request.body.decode('utf-8'))
 
-            # Validasi input
             YOLO_DATA["motor"] = int(data.get("motor", 0))
             YOLO_DATA["mobil"] = int(data.get("mobil", 0))
             YOLO_DATA["pelanggar"] = int(data.get("pelanggar", 0))
@@ -158,7 +154,6 @@ def yolo_test(request):
             YOLO_DATA["stream_active"] = bool(data.get("stream_active", True))
             YOLO_DATA["last_update"] = time.strftime("%Y-%m-%d %H:%M:%S")
 
-            # Debug ke console
             print("\n=== DATA DARI YOLO ===")
             print(json.dumps(YOLO_DATA, indent=4))
 
@@ -172,13 +167,9 @@ def yolo_test(request):
 
 
 # ================================================================
-# ENDPOINT UNTUK DASHBOARD — MENGIRIM DATA TERBARU (GET)
+# API — KIRIM DATA TERBARU KE DASHBOARD (GET)
 # ================================================================
 def get_yolo_data(request):
-    """
-    Dipanggil oleh dashboard/livestream setiap 1 detik.
-    Mengirim data terbaru yang diterima dari YOLO.
-    """
     global YOLO_DATA
 
     if YOLO_DATA["last_update"] is None:

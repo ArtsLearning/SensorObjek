@@ -1,65 +1,6 @@
-{% extends "base_dashboard.html" %}
-{% load static %}
-
-{% block content %}
-
-<div class="flex justify-between items-center mb-8">
-    <h1 class="text-2xl font-bold text-blue-700 flex items-center gap-3">
-        <i class="fa fa-table"></i> Tabel Pelanggaran
-    </h1>
-</div>
-
-<div class="bg-white p-6 shadow rounded-2xl">
-
-    <table class="w-full text-left">
-        <thead>
-            <tr class="border-b font-semibold text-gray-700">
-                <th class="p-3">ID</th>
-                <th class="p-3">Bukti Foto</th>
-                <th class="p-3">Tanggal</th>
-                <th class="p-3">Aksi</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for item in data %}
-            <tr class="border-b hover:bg-gray-100 transition">
-
-                <td class="p-3">{{ forloop.counter }}</td>
-
-                <td class="p-3">
-                    <img src="{{ item.bukti_foto.url }}"
-                         class="w-20 h-14 object-cover rounded-md shadow cursor-pointer"
-                         onclick="openDetail('{{ item.id }}','{{ item.bukti_foto.url }}','{{ item.tanggal }}','{{ item.waktu }}','{{ item.lokasi }}')">
-                </td>
-
-                <td class="p-3">
-                    {{ item.tanggal }}
-                    <br>
-                    <span class="text-gray-500 text-sm">{{ item.waktu }}</span>
-                </td>
-
-                <td class="p-3 flex gap-4 text-xl">
-
-                    <!-- DELETE -->
-                    <i class="fa fa-trash text-red-500 cursor-pointer"
-                       onclick="confirmDelete('{{ item.id }}')"></i>
-
-                    <!-- EXPORT PDF (TIDAK LANGSUNG DOWNLOAD) -->
-                    <i class="fa fa-download text-blue-600 cursor-pointer"
-                       onclick="openDetail('{{ item.id }}','{{ item.bukti_foto.url }}','{{ item.tanggal }}','{{ item.waktu }}','{{ item.lokasi }}')"></i>
-
-                </td>
-
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<!-- =========================
-       MODAL DETAIL
-========================= -->
+<!-- =========================================================
+     MODAL DETAIL PELANGGARAN
+========================================================= -->
 <div id="detailCard" class="hidden fixed inset-0 bg-black/50 flex justify-center items-center z-50">
     <div class="bg-white rounded-2xl shadow-xl p-6 w-[450px]">
 
@@ -82,9 +23,10 @@
     </div>
 </div>
 
-<!-- =========================
-       MODAL DELETE CONFIRM
-========================= -->
+
+<!-- =========================================================
+     MODAL DELETE CONFIRM
+========================================================= -->
 <div id="deleteModal" class="hidden fixed inset-0 bg-black/60 flex justify-center items-center z-50">
     <div class="bg-white p-5 rounded-xl shadow-lg w-[350px] text-center">
         <h2 class="text-xl font-bold mb-4">Hapus Data?</h2>
@@ -97,15 +39,17 @@
     </div>
 </div>
 
+
+<!-- =========================================================
+     SCRIPT FUNCTION
+========================================================= -->
 <script>
-// ▪▪▪ DETAIL MODAL ▪▪▪
 function openDetail(id, img, tanggal, waktu, lokasi) {
     document.getElementById("detailId").innerText = id;
     document.getElementById("detailImg").src = img;
     document.getElementById("detailTime").innerText = tanggal + " • " + waktu;
     document.getElementById("detailLocation").innerText = lokasi;
 
-    // Tombol export hanya dijalankan dari modal
     document.getElementById("exportBtn").onclick = function () {
         window.location.href = "/export/" + id + "/";
     };
@@ -117,7 +61,6 @@ function closeDetail() {
     document.getElementById("detailCard").classList.add("hidden");
 }
 
-// ▪▪▪ DELETE MODAL ▪▪▪
 function confirmDelete(id) {
     document.getElementById("deleteYes").href = "/delete/" + id + "/";
     document.getElementById("deleteModal").classList.remove("hidden");
@@ -127,5 +70,3 @@ function closeDelete() {
     document.getElementById("deleteModal").classList.add("hidden");
 }
 </script>
-
-{% endblock %}

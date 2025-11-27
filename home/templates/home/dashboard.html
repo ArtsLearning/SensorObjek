@@ -7,27 +7,25 @@
 
 <div class="space-y-10">
 
-    <!-- =============================== -->
+    <!-- ======================== -->
     <!-- TOP SEARCH + PROFILE -->
-    <!-- =============================== -->
+    <!-- ======================== -->
     <div class="flex justify-between items-center">
-        <input type="text"
-               placeholder="Cari data..."
-               class="px-4 py-2 w-80 rounded-xl border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500" />
+        <input type="text" placeholder="Cari data..."
+            class="px-4 py-2 w-80 rounded-xl border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500"/>
 
         <div class="flex items-center gap-4">
             <i class="fa fa-bell text-2xl text-gray-600"></i>
             <img src="https://randomuser.me/api/portraits/men/32.jpg"
-                 class="w-12 h-12 rounded-full border-2 border-blue-500"/>
+                class="w-12 h-12 rounded-full border-2 border-blue-500"/>
         </div>
     </div>
 
-    <!-- =============================== -->
-    <!-- TOP STAT CARDS -->
-    <!-- =============================== -->
+    <!-- ======================== -->
+    <!-- STAT CARDS -->
+    <!-- ======================== -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
 
-        <!-- Motor -->
         <div class="bg-white shadow rounded-xl p-6 flex items-center gap-4">
             <i class="fa fa-motorcycle text-3xl text-blue-700"></i>
             <div>
@@ -36,7 +34,6 @@
             </div>
         </div>
 
-        <!-- Mobil -->
         <div class="bg-white shadow rounded-xl p-6 flex items-center gap-4">
             <i class="fa fa-car text-3xl text-blue-700"></i>
             <div>
@@ -45,7 +42,6 @@
             </div>
         </div>
 
-        <!-- Pelanggar -->
         <div class="bg-white shadow rounded-xl p-6 flex items-center gap-4">
             <i class="fa fa-user-times text-3xl text-red-600"></i>
             <div>
@@ -54,7 +50,6 @@
             </div>
         </div>
 
-        <!-- Total Kendaraan -->
         <div class="bg-white shadow rounded-xl p-6 flex items-center gap-4">
             <i class="fa fa-road text-3xl text-green-600"></i>
             <div>
@@ -65,18 +60,16 @@
 
     </div>
 
-    <!-- =============================== -->
+    <!-- ======================== -->
     <!-- CHARTS -->
-    <!-- =============================== -->
+    <!-- ======================== -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <!-- Donut Chart -->
         <div class="bg-white shadow rounded-xl p-6">
             <h3 class="font-semibold mb-4 text-gray-700">Rasio Kendaraan</h3>
             <canvas id="donutChart"></canvas>
         </div>
 
-        <!-- Line Chart -->
         <div class="md:col-span-2 bg-white shadow rounded-xl p-6">
             <h3 class="font-semibold mb-4 text-gray-700">Trend Total Kendaraan Per Bulan</h3>
             <canvas id="lineChart"></canvas>
@@ -84,52 +77,155 @@
 
     </div>
 
-    <!-- =============================== -->
-    <!-- DATA TABLE -->
-    <!-- =============================== -->
+    <!-- ======================== -->
+    <!-- DATA PELANGGARAN TERBARU -->
+    <!-- ======================== -->
     <div class="bg-white shadow rounded-xl p-6">
         <h2 class="text-xl font-bold mb-4">Data Pelanggaran Terbaru</h2>
+
+        <!-- ======================== -->
+        <!-- FILTER TANGGAL -->
+        <!-- ======================== -->
+        <div class="mb-4">
+            <input id="filterDate" type="date"
+                class="px-3 py-2 rounded-xl border border-gray-300 shadow-sm"/>
+        </div>
 
         <table class="w-full text-left">
             <thead class="border-b bg-gray-50">
                 <tr>
                     <th class="p-3">ID</th>
-                    <th class="p-3">Nomor Plat</th>
+                    <th class="p-3">Bukti Foto</th>
                     <th class="p-3">Tanggal</th>
                     <th class="p-3">Aksi</th>
                 </tr>
             </thead>
+
             <tbody>
-                {% for n in "12345"|make_list %}
+                {% for item in pelanggaran_terbaru %}
                 <tr class="border-b hover:bg-gray-100 transition">
-                    <td class="p-3 font-semibold">#00{{ forloop.counter }}</td>
-                    <td class="p-3">BP 1234 AC</td>
-                    <td class="p-3">27-10-2025</td>
-                    <td class="p-3 flex gap-4">
-                        <i class="fa fa-eye text-blue-600 cursor-pointer"></i>
-                        <i class="fa fa-pen text-yellow-600 cursor-pointer"></i>
-                        <i class="fa fa-trash text-red-600 cursor-pointer"></i>
+
+                    <!-- ID 1–5 -->
+                    <td class="p-3 font-semibold">{{ forloop.counter }}</td>
+
+                    <!-- FOTO -->
+                    <td class="p-3">
+                        <img src="{{ item.bukti_foto.url }}"
+                            class="w-20 h-14 object-cover rounded-lg shadow cursor-pointer"
+                            onclick="openDetail('{{ item.id }}','{{ item.bukti_foto.url }}','{{ item.tanggal }}','{{ item.waktu }}','{{ item.lokasi }}')">
                     </td>
+
+                    <!-- TANGGAL (fix: tambah data-date) -->
+                    <td class="p-3"
+                        data-date="{{ item.tanggal|date:'Y-m-d' }}">
+                        {{ item.tanggal }}<br>
+                        <span class="text-gray-500 text-sm">{{ item.waktu }}</span>
+                    </td>
+
+                    <!-- Aksi -->
+                    <td class="p-3 flex gap-4 text-xl">
+
+                        <!-- DELETE -->
+                        <i class="fa fa-trash text-red-600 cursor-pointer"
+                            onclick="confirmDelete('{{ item.id }}')"></i>
+
+                        <!-- EXPORT → lewat modal -->
+                        <i class="fa fa-download text-blue-600 cursor-pointer"
+                            onclick="openDetail('{{ item.id }}','{{ item.bukti_foto.url }}','{{ item.tanggal }}','{{ item.waktu }}','{{ item.lokasi }}')"></i>
+
+                    </td>
+
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
+        <div class="mt-5 flex justify-end">
+            <a href="{% url 'tabel_pelanggaran' %}"
+               class="px-5 py-2 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700">
+                Lihat Semua Pelanggaran →
+            </a>
+        </div>
     </div>
 
 </div>
 
-<!-- =============================== -->
-<!-- CHART JS SCRIPT -->
-<!-- =============================== -->
+<!-- ======================== -->
+<!-- MODAL DETAIL -->
+<!-- ======================== -->
+<div id="detailCard" class="hidden fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+    <div class="bg-white rounded-2xl shadow-xl p-6 w-[450px]">
+
+        <div class="flex justify-between mb-3">
+            <h2 class="text-xl font-bold">Detail Pelanggaran</h2>
+            <i class="fa fa-times text-xl cursor-pointer" onclick="closeDetail()"></i>
+        </div>
+
+        <img id="detailImg" class="rounded-xl w-full h-60 object-cover shadow mb-4">
+
+        <p><strong>ID:</strong> <span id="detailId"></span></p>
+        <p><strong>Waktu:</strong> <span id="detailTime"></span></p>
+        <p><strong>Lokasi:</strong> <span id="detailLocation"></span></p>
+
+        <button id="exportBtn"
+            class="w-full bg-blue-600 text-white mt-5 py-2 rounded-xl hover:bg-blue-700">
+            Export PDF
+        </button>
+    </div>
+</div>
+
+<!-- ======================== -->
+<!-- MODAL DELETE -->
+<!-- ======================== -->
+<div id="deleteModal" class="hidden fixed inset-0 bg-black/60 flex justify-center items-center z-50">
+    <div class="bg-white p-5 rounded-xl shadow-lg w-[350px] text-center">
+        <h2 class="text-xl font-bold mb-4">Hapus Data?</h2>
+        <p class="mb-4">Apakah Anda yakin ingin menghapus data ini?</p>
+
+        <div class="flex justify-center gap-4">
+            <button onclick="closeDelete()" class="px-4 py-2 bg-gray-300 rounded-lg">Batal</button>
+            <a id="deleteYes" class="px-4 py-2 bg-red-600 text-white rounded-lg">Hapus</a>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== -->
+<!-- JAVASCRIPT: MODAL -->
+<!-- ======================== -->
+<script>
+function openDetail(id, img, tanggal, waktu, lokasi) {
+    document.getElementById("detailId").innerText = id;
+    document.getElementById("detailImg").src = img;
+    document.getElementById("detailTime").innerText = tanggal + " • " + waktu;
+    document.getElementById("detailLocation").innerText = lokasi;
+
+    document.getElementById("exportBtn").onclick = () =>
+        window.location.href = "/export/" + id + "/";
+
+    document.getElementById("detailCard").classList.remove("hidden");
+}
+
+function closeDetail() {
+    document.getElementById("detailCard").classList.add("hidden");
+}
+
+function confirmDelete(id) {
+    document.getElementById("deleteYes").href = "/delete/" + id + "/";
+    document.getElementById("deleteModal").classList.remove("hidden");
+}
+
+function closeDelete() {
+    document.getElementById("deleteModal").classList.add("hidden");
+}
+</script>
+
+<!-- ======================== -->
+<!-- CHARTS -->
+<!-- ======================== -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-/* ======================= */
-/* DONUT CHART */
-/* ======================= */
-const donutCtx = document.getElementById("donutChart");
-window.donutChart = new Chart(donutCtx, {
+window.donutChart = new Chart(document.getElementById("donutChart"), {
     type: "doughnut",
     data: {
         labels: ["Motor", "Mobil", "Pelanggar"],
@@ -139,17 +235,10 @@ window.donutChart = new Chart(donutCtx, {
             borderWidth: 0
         }]
     },
-    options: {
-        cutout: "65%",
-        plugins: { legend: { position: "bottom" } }
-    }
+    options: { cutout: "65%" }
 });
 
-/* ======================= */
-/* LINE CHART */
-/* ======================= */
-const lineCtx = document.getElementById("lineChart");
-window.lineChart = new Chart(lineCtx, {
+window.lineChart = new Chart(document.getElementById("lineChart"), {
     type: "line",
     data: {
         labels: ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu"],
@@ -161,38 +250,42 @@ window.lineChart = new Chart(lineCtx, {
             tension: 0.3,
             fill: true
         }]
-    },
-    options: {
-        plugins: { legend: { position: "bottom" }},
-        scales: {
-            y: { beginAtZero: true }
-        }
     }
 });
 
-/* ======================= */
-/* UPDATE CHART REALTIME */
-/* ======================= */
 function updateCharts(data) {
-    // Update Donut Chart
-    if (window.donutChart) {
-        window.donutChart.data.datasets[0].data = [
-            data.motor,
-            data.mobil,
-            data.pelanggar
-        ];
-        window.donutChart.update();
-    }
-
-    // Update nilai di atas kartu (Total tanpa pelanggar)
-    const total = data.motor + data.mobil;
-    updateText("total-count", total);
+    window.donutChart.data.datasets[0].data = [
+        data.motor, data.mobil, data.pelanggar
+    ];
+    window.donutChart.update();
 }
 </script>
 
-<!-- =============================== -->
-<!-- GLOBAL REALTIME JS -->
-<!-- =============================== -->
+<!-- ======================== -->
+<!-- FILTER SCRIPT -->
+<!-- ======================== -->
+<script>
+const fDate = document.getElementById("filterDate");
+
+function applyFilterDate() {
+    const selected = fDate.value;
+    const rows = document.querySelectorAll("table tbody tr");
+
+    rows.forEach(row => {
+        const cell = row.querySelector("td[data-date]");
+        if (!cell) return;
+
+        const rowDate = cell.dataset.date; // format YYYY-MM-DD
+        row.style.display = (selected === "" || rowDate === selected)
+            ? ""
+            : "none";
+    });
+}
+
+fDate.addEventListener("change", applyFilterDate);
+</script>
+
+<!-- REALTIME -->
 <script src="{% static 'js/realtime.js' %}"></script>
 
 {% endblock %}
