@@ -1,0 +1,121 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Hasil Deteksi Pelanggaran</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Icons -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #2c3e7d 0%, #4353a1 100%);
+            font-family: 'Poppins', sans-serif;
+            color: white;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen pb-20">
+
+    <!-- =============================== -->
+    <!-- BACK BUTTON (SAMA DENGAN LIVESTREAM) -->
+    <!-- =============================== -->
+    <div class="w-full px-6 py-4">
+        <button onclick="window.location.href='/livestream/'"
+            class="text-2xl text-white hover:text-blue-300 transition">
+            <i class="fa fa-arrow-left"></i>
+        </button>
+    </div>
+
+    <!-- PAGE TITLE -->
+    <h1 class="text-center text-3xl font-bold tracking-wide drop-shadow-md">
+        TABEL PELANGGARAN
+    </h1>
+
+    <!-- CONTENT WRAPPER -->
+    <div class="max-w-5xl mx-auto mt-10 px-4">
+
+        <h2 class="text-xl font-bold mb-4">Hasil Deteksi Pelanggaran</h2>
+
+        <!-- =============================== -->
+        <!-- FILTER -->
+        <!-- =============================== -->
+        <form method="GET" class="mb-6 flex gap-4 items-center">
+
+            <input type="date" name="tanggal" value="{{ filter_tanggal }}"
+                class="px-4 py-2 rounded-xl border border-gray-300 
+                       bg-white text-black shadow focus:ring-2 focus:ring-blue-600">
+
+            <button type="submit"
+                class="px-5 py-2 bg-blue-600 text-white rounded-xl shadow 
+                       hover:bg-blue-700 transition">
+                Filter
+            </button>
+
+            <a href="{% url 'user_pelanggaran' %}"
+                class="px-5 py-2 bg-gray-400 text-white rounded-xl shadow 
+                       hover:bg-gray-500 transition">
+                Reset
+            </a>
+        </form>
+
+        <!-- =============================== -->
+        <!-- TABLE DATA -->
+        <!-- =============================== -->
+        <div class="bg-white text-black p-6 shadow-xl rounded-2xl">
+
+            <table class="w-full text-left">
+                <thead class="border-b bg-gray-100">
+                    <tr>
+                        <th class="p-3 font-semibold">ID</th>
+                        <th class="p-3 font-semibold">Bukti Foto</th>
+                        <th class="p-3 font-semibold">Tanggal</th>
+                        <th class="p-3 font-semibold">Waktu</th>
+                        <th class="p-3 font-semibold">Lokasi</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in data %}
+                    <tr class="border-b hover:bg-gray-200 transition">
+
+                        <td class="p-3 font-semibold">{{ forloop.counter }}</td>
+
+                        <td class="p-3">
+                            <img src="{{ item.bukti_foto.url }}"
+                                class="w-20 h-14 object-cover rounded shadow">
+                        </td>
+
+                        <td class="p-3">{{ item.tanggal }}</td>
+                        <td class="p-3">{{ item.waktu }}</td>
+                        <td class="p-3">{{ item.lokasi }}</td>
+
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-gray-500">
+                            Tidak ada data untuk tanggal ini.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

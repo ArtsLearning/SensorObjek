@@ -42,21 +42,17 @@ def livestream(request):
 
 
 # ================================================================
-# DASHBOARD ADMIN  (✔ Diperbaiki)
+# DASHBOARD ADMIN
 # ================================================================
 def dashboard(request):
-    """
-    Dashboard admin butuh data 5 pelanggaran terbaru.
-    """
     pelanggaran_terbaru = Pelanggaran.objects.order_by('-id')[:5]
-
     return render(request, 'home/dashboard.html', {
         "pelanggaran_terbaru": pelanggaran_terbaru
     })
 
 
 # ================================================================
-# LIVESTREAM DI DALAM DASHBOARD ADMIN
+# LIVESTREAM ADMIN
 # ================================================================
 def livestream_dashboard(request):
     return render(request, "home/livestream_dashboard.html")
@@ -70,7 +66,7 @@ def setting_page(request):
 
 
 # ================================================================
-# TABEL PELANGGARAN (FULL DATA)
+# FULL TABEL PELANGGARAN (ADMIN)
 # ================================================================
 def tabel_pelanggaran(request):
     data = Pelanggaran.objects.all().order_by('-id')
@@ -78,12 +74,11 @@ def tabel_pelanggaran(request):
 
 
 # ================================================================
-# DELETE PELANGGARAN
+# DELETE DATA (ADMIN)
 # ================================================================
 def delete_pelanggaran(request, id):
     pelanggaran = get_object_or_404(Pelanggaran, id=id)
 
-    # Hapus file foto
     if pelanggaran.bukti_foto:
         try:
             if os.path.isfile(pelanggaran.bukti_foto.path):
@@ -137,7 +132,7 @@ def export_pdf(request, id):
 
 
 # ================================================================
-# API — MENERIMA DATA YOLO (POST)
+# TERIMA DATA YOLO (POST)
 # ================================================================
 @csrf_exempt
 def yolo_test(request):
@@ -167,7 +162,7 @@ def yolo_test(request):
 
 
 # ================================================================
-# API — KIRIM DATA TERBARU KE DASHBOARD (GET)
+# KIRIM DATA YOLO KE DASHBOARD (GET)
 # ================================================================
 def get_yolo_data(request):
     global YOLO_DATA
@@ -183,3 +178,26 @@ def get_yolo_data(request):
         })
 
     return JsonResponse(YOLO_DATA, safe=False)
+
+
+
+# ================================================================
+#  USER PELANGGARAN PAGE (✔ BARU DITAMBAHKAN)
+# ================================================================
+def user_pelanggaran(request):
+    """
+    Halaman tabel hasil deteksi untuk USER.
+    Tidak ada delete/export.
+    Bisa filter tanggal.
+    """
+    tanggal = request.GET.get("tanggal")
+
+    data = Pelanggaran.objects.all().order_by('-id')
+
+    if tanggal:
+        data = data.filter(tanggal=tanggal)
+
+    return render(request, "home/user_pelanggaran.html", {
+        "data": data,
+        "filter_tanggal": tanggal or "",
+    })

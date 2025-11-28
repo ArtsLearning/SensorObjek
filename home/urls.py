@@ -10,6 +10,7 @@ urlpatterns = [
     path('livestream/', views.livestream, name='livestream'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('livestream-dashboard/', views.livestream_dashboard, name='livestream_dashboard'),
+    path('user-pelanggaran/', views.user_pelanggaran, name='user_pelanggaran'),
     path('setting/', views.setting_page, name='setting'),
 
     # =============================

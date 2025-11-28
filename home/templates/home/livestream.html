@@ -96,7 +96,11 @@
         </div>
     </div>
 
-    <button class="export-btn">CETAK HASIL DETEKSI!</button>
+    <a href="{% url 'user_pelanggaran' %}" 
+   class="px-6 py-3 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700">
+   Lihat Hasil Deteksi →
+</a>
+
 
     {% include "home/components/footer.html" %}
 </section>
