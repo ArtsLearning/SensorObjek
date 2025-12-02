@@ -8,7 +8,7 @@ import requests
 # KONFIGURASI MODEL DAN STREAM
 # ======================================================
 MODEL_PATH = r"D:\Traffic_eye\SensorObjek\YOLO-model\best.pt"
-RTSP_URL = "rtsp://admin:BSUFGS@192.168.18.89:554/h264/ch2/main/av_stream"           # ganti RTSP / video path kalau perlu
+RTSP_URL = r"D:\Traffic_eye\SensorObjek\video\test2.mp4"           # ganti RTSP / video path kalau perlu
 DJANGO_URL = "http://127.0.0.1:8000/api/yolo-test/"
 
 RECONNECT_DELAY = 3
