@@ -1,217 +1,63 @@
+{% load static %}
 <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
 
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-        <meta http-equiv="Pragma" content="no-cache" />
-        <meta http-equiv="Expires" content="0" />
-        
-        <title>Register</title>
+    <link rel="stylesheet" href="{% static 'home/css/auth.css' %}">
+</head>
 
-        {% load static %}
+<body>
+    <div class="container">
 
-        <style>
-            body {
-                margin: 0;
-                padding: 0;
-                font-family: Arial, Helvetica, sans-serif;
-            }
+        <div class="left"></div>
 
-            .container {
-                width: 100vw;
-                height: 100vh;
-                display: flex;
-            }
+        <div class="right">
+            <div class="formbox">
+                <h2>REGISTER</h2>
 
-            .left {
-                width: 50%;
-                background: url("{% static 'home/images/traffic-bg.jpeg' %}");
-                background-size: cover;
-                background-position: center;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
 
-            .left h1 {
-                color: white;
-                font-size: 40px;
-                letter-spacing: 2px;
-            }
+                <form method="POST">
+                    {% csrf_token %}
 
-            .right {
-                width: 50%;
-                background: white;
-                border-radius: 35px 0 0 35px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
+                    <label>USERNAME</label>
+                    <input type="text" name="username" placeholder="Masukkan Username" required>
 
-            .formbox {
-                width: 70%;
-            }
+                    <label>EMAIL</label>
+                    <input type="email" name="email" placeholder="Masukkan Email" required>
 
-            h2 {
-                font-weight: 900;
-                font-size: 26px;
-                margin-bottom: 20px;
-            }
+                    <label>PASSWORD</label>
+                    <input type="password" name="password1" placeholder="Masukkan Password" required>
 
-            label {
-                font-size: 12px;
-                font-weight: 700;
-            }
+                    <label>KONFIRMASI PASSWORD</label>
+                    <input type="password" name="password2" placeholder="Masukkan Konfirmasi Password" required>
 
-            input {
-                width: 100%;
-                padding: 12px;
-                border: none;
-                margin: 10px 0 20px 0;
-                background: #e8e8e8;
-            }
+                    <button type="submit">REGISTER</button>
+                </form>
 
-            button {
-                width: 100%;
-                padding: 15px;
-                background: #0d4afc;
-                color: white;
-                border: none;
-                border-radius: 30px;
-                font-weight: bold;
-                cursor: pointer;
-                margin-top: 10px;
-            }
-
-            .switchlink {
-                text-align: center;
-                margin-top: 15px;
-                display: block;
-                font-size: 13px;
-            }
-
-            /* --- ANIMASI PAGE TRANSITION --- */
-            .page-enter {
-                opacity: 0;
-                transform: translateX(40px);
-            }
-
-            .page-enter-active {
-                opacity: 1;
-                transform: translateX(0);
-                transition: all 0.6s ease;
-            }
-
-            .page-exit {
-                opacity: 1;
-                transform: translateX(0);
-            }
-
-            .page-exit-active {
-                opacity: 0;
-                transform: translateX(-40px);
-                transition: all 0.5s ease;
-            }
-            /* ALERT BOX */
-            .alert {
-                padding: 14px 18px;
-                border-radius: 8px;
-                margin-bottom: 15px;
-                font-size: 13px;
-                font-weight: bold;
-                animation: fadeIn 0.6s ease;
-            }
-
-            /* Warna sukses */
-            .alert-success {
-                background: #d4edda;
-                color: #155724;
-                border-left: 4px solid #28a745;
-            }
-
-            /* Warna error */
-            .alert-error {
-                background: #f8d7da;
-                color: #721c24;
-                border-left: 4px solid #dc3545;
-            }
-
-            /* Animasi fade */
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(-10px); }
-                to   { opacity: 1; transform: translateY(0); }
-            }
-
-            .fade-out {
-                animation: fadeOut 0.8s forwards;
-            }
-
-            @keyframes fadeOut {
-                from { opacity: 1; }
-                to   { opacity: 0; transform: translateY(-10px); }
-            }
-
-        </style>
-    </head>
-
-    <body>
-        <div class="container">
-            <div class="left">
-                <h1>TRAFFIC<br />EYE</h1>
-            </div>
-
-            <div class="right">
-                <div class="formbox">
-                    <h2>REGISTER</h2>
-
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                        {% endfor %}
-                    {% endif %}
-
-                    <form method="POST">
-                        {% csrf_token %}
-
-                        <label>USERNAME</label>
-                        <input type="text" name="username" placeholder="Masukkan Username" required />
-
-                        <label>EMAIL</label>
-                        <input type="text" name="email" placeholder="Masukkan Email" required />
-
-                        <label>PASSWORD</label>
-                        <input type="password" name="password1" placeholder="Masukkan Password" required />
-
-                        <label>CONFIRM PASSWORD</label>
-                        <input type="password" name="password2" placeholder="Masukkan Konfirmasi Password" required />
-
-                        <button type="submit">REGISTER</button>
-                    </form>
-
-                    <a class="switchlink" href="{% url 'login' %}">Sudah Mempunyai Akun? Silahkan Login</a>
-                </div>
+                <a class="switchlink" href="{% url 'login' %}">Sudah Mempunyai Akun? Silahkan Login</a>
             </div>
         </div>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const container = document.querySelector(".right");
+    </div>
 
-                // Efek masuk
-                container.classList.add("page-enter");
-                setTimeout(() => {
-                    container.classList.add("page-enter-active");
-                }, 10);
-            });
-            // Auto fade-out setelah 3 detik
-            setTimeout(() => {
-                document.querySelectorAll(".alert").forEach(el => {
-                    el.classList.add("fade-out");
-                });
-            }, 3000);
-        </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const container = document.querySelector(".right");
+            container.classList.add("page-enter");
+            setTimeout(() => container.classList.add("page-enter-active"), 10);
+        });
 
-    </body>
-    </html>
+        setTimeout(() => {
+            document.querySelectorAll(".alert").forEach(el => el.classList.add("fade-out"));
+        }, 3000);
+    </script>
+
+</body>
+</html>

@@ -1,165 +1,19 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-
+    <meta charset="UTF-8">
     <title>Login</title>
 
-    {% load static %}
-
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        .container {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-        }
-
-        .left {
-            width: 50%;
-            background: url("{% static 'home/images/traffic-bg.jpeg' %}");
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .left h1 {
-            color: white;
-            font-size: 40px;
-            letter-spacing: 2px;
-        }
-
-        .right {
-            width: 50%;
-            background: white;
-            border-radius: 35px 0 0 35px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .formbox {
-            width: 70%;
-        }
-
-        h2 {
-            font-weight: 900;
-            font-size: 26px;
-            margin-bottom: 20px;
-        }
-
-        label {
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            margin: 10px 0 20px 0;
-            background: #e8e8e8;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background: #0d4afc;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .switchlink {
-            text-align: center;
-            margin-top: 15px;
-            display: block;
-            font-size: 13px;
-        }
-        /* --- ANIMASI PAGE TRANSITION --- */
-        .page-enter {
-            opacity: 0;
-            transform: translateX(40px);
-        }
-
-        .page-enter-active {
-            opacity: 1;
-            transform: translateX(0);
-            transition: all 0.6s ease;
-        }
-
-        .page-exit {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .page-exit-active {
-            opacity: 0;
-            transform: translateX(-40px);
-            transition: all 0.5s ease;
-        }
-        /* ALERT BOX */
-        .alert {
-            padding: 14px 18px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 13px;
-            font-weight: bold;
-            animation: fadeIn 0.6s ease;
-        }
-
-        /* Warna sukses */
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
-
-        /* Warna error */
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
-
-        /* Animasi fade */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .fade-out {
-            animation: fadeOut 0.8s forwards;
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to   { opacity: 0; transform: translateY(-10px); }
-        }
-
-    </style>
+    <link rel="stylesheet" href="{% static 'home/css/auth.css' %}">
 </head>
 
 <body>
-    <div class="container">
-        <div class="left">
-            <h1>TRAFFIC<br />EYE</h1>
-        </div>
+    <a href="{% url 'home' %}" class="auth-back-btn">&#8592;</a>
+    
+    <div class="container login-mode">
+
+        <div class="left"></div>
 
         <div class="right">
             <div class="formbox">
@@ -175,36 +29,31 @@
                     {% csrf_token %}
 
                     <label>USERNAME</label>
-                    <input type="text" name="username" placeholder="Masukkan Username" required />
+                    <input type="text" name="username" placeholder="Masukkan Username" required>
 
                     <label>PASSWORD</label>
-                    <input type="password" name="password" placeholder="Masukkan Password" required />
+                    <input type="password" name="password" placeholder="Masukkan Password" required>
 
                     <button type="submit">LOGIN</button>
 
-                    <div style="color:red; margin-top:5px;">{{ msg }}</div>
+                    <div class="error-msg">{{ msg }}</div>
                 </form>
 
                 <a class="switchlink" href="{% url 'register' %}">Belum Mempunyai Akun? Silahkan Daftar</a>
             </div>
         </div>
+
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const container = document.querySelector(".right");
-
-            // Efek masuk
             container.classList.add("page-enter");
-            setTimeout(() => {
-                container.classList.add("page-enter-active");
-            }, 10);
+            setTimeout(() => container.classList.add("page-enter-active"), 10);
         });
-        // Auto fade-out setelah 3 detik
+
         setTimeout(() => {
-            document.querySelectorAll(".alert").forEach(el => {
-                el.classList.add("fade-out");
-            });
+            document.querySelectorAll(".alert").forEach(el => el.classList.add("fade-out"));
         }, 3000);
     </script>
 

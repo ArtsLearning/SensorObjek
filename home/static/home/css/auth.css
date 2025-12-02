@@ -1,0 +1,268 @@
+/* =============================
+   AUTH BASE
+============================= */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #f3f4f6;
+}
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+}
+
+/* =============================
+   LEFT PANEL (IMAGE)
+============================= */
+.left {
+    width: 50%;
+    background-image: url("/static/home/images/traffic-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    border-radius: 35px 0 0 35px;
+    position: relative;
+}
+
+/* LOGO DI DALAM GAMBAR */
+.left::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.25);
+}
+
+/* =============================
+   RIGHT PANEL (FORM)
+============================= */
+.right {
+    width: 50%;
+    background: #ffffff;
+    border-radius: 0 35px 35px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
+    position: relative;
+}
+
+.formbox {
+    width: 70%;
+    animation: formFadeIn 0.8s ease forwards;
+    opacity: 0;
+}
+
+@keyframes formFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h2 {
+    font-weight: 900;
+    font-size: 32px;
+    margin-bottom: 25px;
+}
+
+/* FORM ITEMS */
+label {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    margin: 10px 0 25px 0;
+    background: #eaeaea;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    background: #0051ff;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 5px;
+    font-size: 16px;
+    transition: 0.25s;
+}
+
+button:hover {
+    background: #003bd9;
+    transform: translateY(-3px);
+}
+
+.switchlink {
+    text-align: center;
+    margin-top: 15px;
+    display: block;
+    font-size: 14px;
+    color: #5b00d7;
+    text-decoration: none;
+}
+
+.switchlink:hover {
+    text-decoration: underline;
+}
+
+/* =============================
+   LOGIN MODE (image on right)
+============================= */
+.login-mode {
+    flex-direction: row-reverse;
+}
+
+.login-mode .left {
+    border-radius: 0 35px 35px 0;
+}
+
+.login-mode .right {
+    border-radius: 35px 0 0 35px;
+}
+
+/* =============================
+   PAGE TRANSITIONS GLOBAL
+============================= */
+.page-enter {
+    opacity: 0;
+    transform: translateY(40px);
+}
+.page-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: 0.6s ease-in-out;
+}
+
+.page-exit {
+    opacity: 1;
+}
+.page-exit-active {
+    opacity: 0;
+    transform: scale(0.96);
+    transition: 0.4s ease;
+}
+
+/* ALERTS */
+.alert {
+    padding: 12px 18px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    animation: fadeIn 0.6s ease;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.error-msg {
+    color: red;
+    margin-top: 5px;
+}
+
+/* =============================
+   BACK BUTTON
+============================= */
+.auth-back-btn {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    text-decoration: none;
+    padding: 10px 18px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: 0.3s ease;
+    z-index: 9999;
+}
+
+.auth-back-btn:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+/* =============================
+   RESPONSIVE FOR LOGIN/REGISTER
+============================= */
+
+@media (max-width: 992px) {
+    .left, .right {
+        width: 50%;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    /* LEFT panel (image) */
+    .left {
+        width: 100%;
+        height: 220px;
+        border-radius: 0 0 25px 25px;
+    }
+
+    /* RIGHT panel (form) */
+    .right {
+        width: 100%;
+        border-radius: 0;
+        padding: 30px 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .formbox {
+        width: 90%;
+    }
+
+    /* Back button position fix */
+    .auth-back-btn {
+        top: 15px;
+        left: 15px;
+        font-size: 16px;
+        padding: 8px 14px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    h2 {
+        font-size: 26px;
+    }
+
+    input {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    button {
+        padding: 13px;
+        font-size: 14px;
+    }
+}
