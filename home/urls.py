@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .API_data_pelanggar import save_violation
 
 
 urlpatterns = [
@@ -34,6 +35,10 @@ urlpatterns = [
 
     # endpoint pengiriman data terbaru ke dashboard frontend
     path('api/yolo-data/', views.get_yolo_data, name='get_yolo_data'),
+
+    # API_data_pelanggar
+    path("api/save-violation/", save_violation, name="save_violation"),
+
 
     # versi baru (placeholder untuk pengembangan selanjutnya)
     # pastikan belum diaktifkan karena views.yolo_get_data belum dibuat
