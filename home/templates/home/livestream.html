@@ -1,105 +1,103 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}LiveStream - Traffic Eye{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% load static %} {% block title %}LiveStream -
+Traffic Eye{% endblock %} {% block content %}
 
 <!-- LIVESTREAM NAVBAR -->
 <nav class="livestream-navbar">
-    <div class="livestream-navbar-container">
-        <button class="livestream-back-btn" onclick="window.location.href='/'">
-            &#8592;
-        </button>
-        <h1 class="livestream-navbar-title">HALAMAN LIVESTREAM</h1>
-        <div class="livestream-navbar-logo">
-            <img src="{% static 'home/images/logo.png' %}" alt="Traffic Eye Logo">
-            <span>TRAFFIC<br>EYE</span>
-        </div>
+  <div class="livestream-navbar-container">
+    <button class="livestream-back-btn" onclick="window.location.href='/'">
+      &#8592;
+    </button>
+    <h1 class="livestream-navbar-title">HALAMAN LIVESTREAM</h1>
+    <div class="livestream-navbar-logo">
+      <img src="{% static 'home/images/logo.png' %}" alt="Traffic Eye Logo" />
+      <span>TRAFFIC<br />EYE</span>
     </div>
+  </div>
 </nav>
 
 <!-- LIVESTREAM VIDEO AREA -->
 <section class="livestream-section">
-    <div class="video-container">
+  <div class="video-container">
+    <div class="video-wrapper">
+      <img
+        id="live-cctv"
+        src="http://127.0.0.1:5000/video_feed"
+        class="video-iframe"
+        alt="Menghubungkan ke CCTV..."
+        style="object-fit: contain; background: #000"
+      />
 
-        <div class="video-wrapper">
-            <iframe 
-                id="webrtc-frame"
-                src="http://127.0.0.1:8889/traffic?video=webrtc"
-                class="video-iframe"
-                frameborder="0"
-                allow="autoplay; fullscreen"
-                allowfullscreen
-                webkitallowfullscreen
-                mozallowfullscreen>
-            </iframe>
-
-            <!-- Tombol Fullscreen (berfungsi) -->
-            <button class="fullscreen-btn" onclick="toggleFullscreen()">
-                ⛶
-            </button>
-        </div>
-
-        <div class="video-overlay">
-            <span id="livestream-status" class="text-red-600 font-semibold">
-                
-            </span>
-        </div>
-
+      <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
     </div>
+
+    <div class="video-overlay">
+      <span id="livestream-status" class="text-red-600 font-semibold"> </span>
+    </div>
+  </div>
 </section>
 
 <!-- ========================== -->
 <!--     STATISTIK CHARTS       -->
 <!-- ========================== -->
 <section class="stats-section">
+  <!-- REALTIME -->
+  <div class="stats-card">
+    <h3>VOLUME KENDARAAN (REALTIME)</h3>
+    <p class="timestamp">
+      di update: <span id="last-update">Belum ada update</span>
+    </p>
 
-    <!-- REALTIME -->
-    <div class="stats-card">
-        <h3>VOLUME KENDARAAN (REALTIME)</h3>
-        <p class="timestamp">di update: <span id="last-update">Belum ada update</span></p>
+    <div class="chart-grid">
+      <div class="chart">
+        <canvas id="motorChart"></canvas>
+        <p>Motor: <span id="motor-count">0</span></p>
+      </div>
 
-        <div class="chart-grid">
-            <div class="chart">
-                <canvas id="motorChart"></canvas>
-                <p>Motor: <span id="motor-count">0</span></p>
-            </div>
+      <div class="chart">
+        <canvas id="mobilChart"></canvas>
+        <p>Mobil: <span id="mobil-count">0</span></p>
+      </div>
 
-            <div class="chart">
-                <canvas id="mobilChart"></canvas>
-                <p>Mobil: <span id="mobil-count">0</span></p>
-            </div>
+      <div class="chart">
+        <canvas id="pelanggarChart"></canvas>
+        <p>Pelanggar: <span id="pelanggar-count">0</span></p>
+      </div>
 
-            <div class="chart">
-                <canvas id="pelanggarChart"></canvas>
-                <p>Pelanggar: <span id="pelanggar-count">0</span></p>
-            </div>
-
-            <div class="chart">
-                <canvas id="totalChart"></canvas>
-                <p>Total: <span id="total-count">0</span></p>
-            </div>
-        </div>
+      <div class="chart">
+        <canvas id="totalChart"></canvas>
+        <p>Total: <span id="total-count">0</span></p>
+      </div>
     </div>
+  </div>
 
-    <!-- HARIAN -->
-    <div class="stats-card">
-        <h3>TOTAL VOLUME KENDARAAN HARIAN</h3>
-        <p class="timestamp">di update: 28/10/2025</p>
+  <!-- HARIAN -->
+  <div class="stats-card">
+    <h3>TOTAL VOLUME KENDARAAN HARIAN</h3>
+    <p class="timestamp">di update: 28/10/2025</p>
 
-        <div class="chart-grid">
-            <div class="chart"><canvas id="motorHarianChart"></canvas><p>Motor</p></div>
-            <div class="chart"><canvas id="mobilHarianChart"></canvas><p>Mobil</p></div>
-            <div class="chart"><canvas id="pelanggarHarianChart"></canvas><p>Pelanggar</p></div>
-            <div class="chart"><canvas id="totalHarianChart"></canvas><p>Total</p></div>
-        </div>
+    <div class="chart-grid">
+      <div class="chart">
+        <canvas id="motorHarianChart"></canvas>
+        <p>Motor</p>
+      </div>
+      <div class="chart">
+        <canvas id="mobilHarianChart"></canvas>
+        <p>Mobil</p>
+      </div>
+      <div class="chart">
+        <canvas id="pelanggarHarianChart"></canvas>
+        <p>Pelanggar</p>
+      </div>
+      <div class="chart">
+        <canvas id="totalHarianChart"></canvas>
+        <p>Total</p>
+      </div>
     </div>
+  </div>
 
-    <a href="{% url 'user_pelanggaran' %}" class="btn-realtime">
-        Lihat Hasil Deteksi
-    </a>
-
+  <a href="{% url 'user_pelanggaran' %}" class="btn-realtime">
+    Lihat Hasil Deteksi
+  </a>
 </section>
 {% include "home/components/footer.html" %}
 
@@ -107,157 +105,171 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-/* ============================
+  /* ============================
    CHART REALTIME (ASLI, TIDAK DIUBAH)
 ============================ */
-const chartList = [
-    { id: 'motorChart', color: '#2563eb' },
-    { id: 'mobilChart', color: '#38bdf8' },
-    { id: 'pelanggarChart', color: '#ef4444' },
-    { id: 'totalChart', color: '#22c55e' }
-];
+  const chartList = [
+    { id: "motorChart", color: "#2563eb" },
+    { id: "mobilChart", color: "#38bdf8" },
+    { id: "pelanggarChart", color: "#ef4444" },
+    { id: "totalChart", color: "#22c55e" },
+  ];
 
-window.liveCharts = {};
+  window.liveCharts = {};
 
-chartList.forEach(cfg => {
+  chartList.forEach((cfg) => {
     const ctx = document.getElementById(cfg.id);
     if (ctx) {
-        window.liveCharts[cfg.id] = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [0, 100],
-                    backgroundColor: [cfg.color, '#e5e7eb'],
-                    borderWidth: 0
-                }]
+      window.liveCharts[cfg.id] = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          datasets: [
+            {
+              data: [0, 100],
+              backgroundColor: [cfg.color, "#e5e7eb"],
+              borderWidth: 0,
             },
-            options: {
-                cutout: '75%',
-                plugins: { legend: { display: false }, tooltip: { enabled: false } }
-            }
-        });
+          ],
+        },
+        options: {
+          cutout: "75%",
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        },
+      });
     }
-});
+  });
 
-/* ============================
+  /* ============================
    CHART HARIAN (PERBAIKAN)
 ============================ */
-const dailyCharts = [
-    { id: 'motorHarianChart', color: '#2563eb' },
-    { id: 'mobilHarianChart', color: '#38bdf8' },
-    { id: 'pelanggarHarianChart', color: '#ef4444' },
-    { id: 'totalHarianChart', color: '#22c55e' }
-];
+  const dailyCharts = [
+    { id: "motorHarianChart", color: "#2563eb" },
+    { id: "mobilHarianChart", color: "#38bdf8" },
+    { id: "pelanggarHarianChart", color: "#ef4444" },
+    { id: "totalHarianChart", color: "#22c55e" },
+  ];
 
-dailyCharts.forEach(cfg => {
+  dailyCharts.forEach((cfg) => {
     const ctx = document.getElementById(cfg.id);
     if (ctx) {
-        window.liveCharts[cfg.id] = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [0, 100],
-                    backgroundColor: [cfg.color, '#e5e7eb'],
-                    borderWidth: 0
-                }]
+      window.liveCharts[cfg.id] = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          datasets: [
+            {
+              data: [0, 100],
+              backgroundColor: [cfg.color, "#e5e7eb"],
+              borderWidth: 0,
             },
-            options: {
-                cutout: '75%',
-                plugins: { legend: { display: false }, tooltip: { enabled: false } }
-            }
-        });
+          ],
+        },
+        options: {
+          cutout: "75%",
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        },
+      });
     }
-});
+  });
 
-
-/* ============================
+  /* ============================
    UPDATE REALTIME DATA
 ============================ */
-function updateCharts(data) {
-
-    if (window.liveCharts['motorChart']) {
-        window.liveCharts['motorChart'].data.datasets[0].data = [data.motor, 100 - data.motor % 100];
-        window.liveCharts['motorChart'].update();
+  function updateCharts(data) {
+    if (window.liveCharts["motorChart"]) {
+      window.liveCharts["motorChart"].data.datasets[0].data = [
+        data.motor,
+        100 - (data.motor % 100),
+      ];
+      window.liveCharts["motorChart"].update();
     }
 
-    if (window.liveCharts['mobilChart']) {
-        window.liveCharts['mobilChart'].data.datasets[0].data = [data.mobil, 100 - data.mobil % 100];
-        window.liveCharts['mobilChart'].update();
+    if (window.liveCharts["mobilChart"]) {
+      window.liveCharts["mobilChart"].data.datasets[0].data = [
+        data.mobil,
+        100 - (data.mobil % 100),
+      ];
+      window.liveCharts["mobilChart"].update();
     }
 
-    if (window.liveCharts['pelanggarChart']) {
-        window.liveCharts['pelanggarChart'].data.datasets[0].data = [data.pelanggar, 100 - data.pelanggar % 100];
-        window.liveCharts['pelanggarChart'].update();
+    if (window.liveCharts["pelanggarChart"]) {
+      window.liveCharts["pelanggarChart"].data.datasets[0].data = [
+        data.pelanggar,
+        100 - (data.pelanggar % 100),
+      ];
+      window.liveCharts["pelanggarChart"].update();
     }
 
-    if (window.liveCharts['totalChart']) {
-        window.liveCharts['totalChart'].data.datasets[0].data = [data.total, 100 - data.total % 100];
-        window.liveCharts['totalChart'].update();
+    if (window.liveCharts["totalChart"]) {
+      window.liveCharts["totalChart"].data.datasets[0].data = [
+        data.total,
+        100 - (data.total % 100),
+      ];
+      window.liveCharts["totalChart"].update();
     }
-}
+  }
 
-
-/* ============================
+  /* ============================
    STATUS LIVESTREAM
 ============================ */
-function updateLivestreamStatus(data) {
+  function updateLivestreamStatus(data) {
     const el = document.getElementById("livestream-status");
 
     if (data.stream_active) {
-        el.textContent = "✅ Live Streaming Aktif";
-        el.classList.remove("text-red-600");
-        el.classList.add("text-green-600");
+      el.textContent = "✅ Live Streaming Aktif";
+      el.classList.remove("text-red-600");
+      el.classList.add("text-green-600");
     } else {
-        el.textContent = "⚠ LIVE STREAMING SEDANG TIDAK TERSEDIA";
-        el.classList.remove("text-green-600");
-        el.classList.add("text-red-600");
+      el.textContent = "⚠ LIVE STREAMING SEDANG TIDAK TERSEDIA";
+      el.classList.remove("text-green-600");
+      el.classList.add("text-red-600");
     }
-}
+  }
 
-
-/* ============================
-   FULLSCREEN BUTTON FIX
+  /* ============================
+   FULLSCREEN BUTTON FIX (UPDATED)
 ============================ */
-function toggleFullscreen() {
-    const iframe = document.getElementById("webrtc-frame");
+  function toggleFullscreen() {
+    // Kita targetkan elemen gambar yang baru
+    const videoElement = document.getElementById("live-cctv");
 
-    if (iframe.requestFullscreen) iframe.requestFullscreen();
-    else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
-    else if (iframe.mozRequestFullScreen) iframe.mozRequestFullScreen();
-    else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
-}
-
+    if (videoElement.requestFullscreen) videoElement.requestFullscreen();
+    else if (videoElement.webkitRequestFullscreen)
+      videoElement.webkitRequestFullscreen(); // Safari
+    else if (videoElement.mozRequestFullScreen)
+      videoElement.mozRequestFullScreen(); // Firefox
+    else if (videoElement.msRequestFullscreen)
+      videoElement.msRequestFullscreen(); // IE/Edge
+  }
 </script>
 
 <script src="{% static 'js/realtime.js' %}"></script>
-
 
 <!-- ============================
    STYLE LIVESTREAM (PERBAIKAN)
 ============================ -->
 <style>
-.video-wrapper {
+  .video-wrapper {
     position: relative;
     width: 100%;
     padding-bottom: 56.25%;
     background: black;
     border-radius: 12px;
     overflow: hidden;
-}
+  }
 
-.video-iframe {
+  .video-iframe {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-}
+  }
 
-.fullscreen-btn {
+  .fullscreen-btn {
     position: absolute;
     bottom: 12px;
     right: 12px;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     padding: 8px 14px;
     border-radius: 6px;
     color: white;
@@ -265,7 +277,7 @@ function toggleFullscreen() {
     cursor: pointer;
     border: 1px solid white;
     z-index: 50;
-}
+  }
 </style>
 
 {% endblock %}
