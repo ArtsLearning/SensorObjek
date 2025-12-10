@@ -14,10 +14,35 @@
         <input type="text" placeholder="Cari data..."
             class="px-4 py-2 w-80 rounded-xl border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500"/>
 
-        <div class="flex items-center gap-4">
-            <i class="fa fa-bell text-2xl text-gray-600"></i>
+        <div class="flex items-center gap-4 relative">
+
+            <div class="relative">
+                
+                <i onclick="toggleNotif()" 
+                   class="fa fa-bell text-2xl cursor-pointer text-gray-700 hover:text-blue-600 transition">
+                </i>
+
+                <span id="notif-badge" 
+                      class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full animate-bounce">
+                    0
+                </span>
+
+                <div id="notifBox"
+                    class="hidden absolute right-0 top-12 w-80 bg-white border border-gray-100 rounded-xl shadow-2xl p-4 z-50 transform origin-top-right transition-all">
+
+                    <div class="flex justify-between items-center mb-3 border-b pb-2">
+                        <h3 class="font-bold text-gray-700">Notifikasi Terbaru</h3>
+                        <span onclick="toggleNotif()" class="text-xs text-blue-500 cursor-pointer hover:underline">Tutup</span>
+                    </div>
+
+                    <div id="notif-list-container" class="max-h-60 overflow-y-auto space-y-2">
+                        <p class="text-gray-400 text-sm text-center py-4">Memuat data...</p>
+                    </div>
+                </div>
+            </div>
+
             <img src="https://randomuser.me/api/portraits/men/32.jpg"
-                class="w-12 h-12 rounded-full border-2 border-blue-500"/>
+                class="w-12 h-12 rounded-full border-2 border-blue-500 object-cover"/>
         </div>
     </div>
 
@@ -190,6 +215,21 @@
 </div>
 
 <!-- ======================== -->
+<!-- Notifikasi -->
+<!-- ======================== -->
+<script>
+function toggleNotif() {
+    const box = document.getElementById("notifBox");
+    box.classList.toggle("hidden");
+
+    // ketika notifikasi dibuka, tandai sebagai sudah dibaca
+    if (!box.classList.contains("hidden")) {
+        fetch("/notif/read-all/");
+    }
+}
+</script>
+
+<!-- ======================== -->
 <!-- JAVASCRIPT: MODAL -->
 <!-- ======================== -->
 <script>
@@ -218,6 +258,8 @@ function closeDelete() {
     document.getElementById("deleteModal").classList.add("hidden");
 }
 </script>
+
+
 
 <!-- ======================== -->
 <!-- CHARTS -->
@@ -287,5 +329,80 @@ fDate.addEventListener("change", applyFilterDate);
 
 <!-- REALTIME -->
 <script src="{% static 'js/realtime.js' %}"></script>
+<script>
+// FUNGSI TOGGLE BOX
+// FUNGSI BUKA TUTUP LONCENG (LOGIKA BARU)
+// FUNGSI BUKA TUTUP LONCENG (FIXED: Angka Hilang, List Tetap Ada)
+function toggleNotif() {
+    const box = document.getElementById("notifBox");
+    const badge = document.getElementById("notif-badge");
+    
+    const isClosed = box.classList.contains("hidden");
 
+    if (isClosed) {
+        // === SAAT DIBUKA ===
+        box.classList.remove("hidden");
+    
+    } else {
+        // === SAAT DITUTUP ===
+        box.classList.add("hidden");
+
+        // 1. Lapor ke server "Sudah baca semua" (Biar database update)
+        fetch("/notif/read-all/")
+        .then(() => {
+            // 2. Sembunyikan Badge Merah secara visual langsung (biar responsif)
+            if(badge) badge.classList.add("hidden");
+            
+            // 3. Refresh data (Nanti server akan kirim unread_count = 0, tapi list tetap ada 5)
+            fetchNotifications(); 
+        });
+    }
+}
+// FUNGSI FETCH DATA
+function fetchNotifications() {
+    fetch('/api/get-notif/')
+    .then(response => {
+        if (!response.ok) throw new Error("Gagal connect API");
+        return response.json();
+    })
+    .then(data => {
+        // Ambil elemen
+        const badge = document.getElementById("notif-badge");
+        const listContainer = document.getElementById("notif-list-container");
+
+        // Cek dulu elemennya ada gak (Safety Check)
+        if (!badge || !listContainer) return;
+
+        // 1. Update Badge
+        if (data.unread_count > 0) {
+            badge.innerText = data.unread_count;
+            badge.classList.remove("hidden");
+        } else {
+            badge.classList.add("hidden");
+        }
+
+        // 2. Update List
+        listContainer.innerHTML = ""; 
+
+        if (data.notifications.length === 0) {
+            listContainer.innerHTML = '<p class="text-gray-500 text-sm text-center py-2">Tidak ada notifikasi baru.</p>';
+        } else {
+            data.notifications.forEach(n => {
+                const item = `
+                    <div class="border-b py-2 text-sm hover:bg-gray-50 px-2 rounded">
+                        <p class="font-medium text-gray-800">${n.pesan}</p>
+                        <span class="text-xs text-gray-400">${n.waktu}</span>
+                    </div>
+                `;
+                listContainer.innerHTML += item;
+            });
+        }
+    })
+    .catch(err => console.error("Error Notif:", err));
+}
+
+// Jalankan rutin
+setInterval(fetchNotifications, 3000);
+fetchNotifications();
+</script>
 {% endblock %}

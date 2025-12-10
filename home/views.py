@@ -11,7 +11,7 @@ import os
 import json
 import time
 
-from .models import Pelanggaran
+from .models import Pelanggaran, Notifikasi
 
 
 # ================================================================
@@ -46,9 +46,22 @@ def livestream(request):
 # ================================================================
 def dashboard(request):
     pelanggaran_terbaru = Pelanggaran.objects.order_by('-id')[:5]
+
+    notif_list = Notifikasi.objects.order_by('-created_at')[:5]
+    notif_unread = Notifikasi.objects.filter(is_read=False).count()
+
     return render(request, 'home/dashboard.html', {
-        "pelanggaran_terbaru": pelanggaran_terbaru
+        "pelanggaran_terbaru": pelanggaran_terbaru,
+        "notif_list": notif_list,
+        "notif_unread": notif_unread,
     })
+
+# ================================================================
+# MARK READ
+# ================================================================
+def mark_read(request):
+    Notifikasi.objects.filter(is_read=False).update(is_read=True)
+    return JsonResponse({"status": "ok"})
 
 
 # ================================================================
@@ -200,4 +213,27 @@ def user_pelanggaran(request):
     return render(request, "home/user_pelanggaran.html", {
         "data": data,
         "filter_tanggal": tanggal or "",
+    })
+    
+# ================================================================
+# API GET NOTIFIKASI REALTIME (JSON)
+# ================================================================
+def get_notifications(request):
+    # UBAH DISINI: Hapus .filter(is_read=False) untuk list notifikasi
+    # Jadi dia akan mengambil 5 notifikasi TERBARU (baik yg sudah dibaca maupun belum)
+    notif_list = Notifikasi.objects.order_by('-created_at')[:5]
+    
+    # Hitung jumlah yang belum dibaca (khusus untuk angka merah)
+    notif_unread = Notifikasi.objects.filter(is_read=False).count()
+
+    data_list = []
+    for n in notif_list:
+        data_list.append({
+            "pesan": n.pesan,
+            "waktu": n.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        })
+
+    return JsonResponse({
+        "unread_count": notif_unread,
+        "notifications": data_list
     })

@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.core.files.base import ContentFile
-from .models import Pelanggaran
+from .models import Pelanggaran, Notifikasi
 import base64
 import datetime
 
@@ -21,9 +21,15 @@ def save_violation(request):
         filename = f"pelanggar_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.{ext}"
         file_data = ContentFile(base64.b64decode(imgstr), name=filename)
 
-        Pelanggaran.objects.create(
+        # SIMPAN PELANGGARAN
+        pelanggaran = Pelanggaran.objects.create(
             bukti_foto=file_data,
             lokasi=lokasi,
+        )
+
+        # === 📢 SIMPAN NOTIFIKASI BARU ===
+        Notifikasi.objects.create(
+            pesan=f"Pelanggaran baru terdeteksi di lokasi {lokasi} (ID: {pelanggaran.id})"
         )
 
         return Response({"status": "ok", "msg": "Pelanggaran disimpan"})

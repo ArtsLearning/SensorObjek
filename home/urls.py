@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from .API_data_pelanggar import save_violation
-
+from home.views import mark_read
 
 urlpatterns = [
     # =============================
@@ -44,4 +44,8 @@ urlpatterns = [
     # pastikan belum diaktifkan karena views.yolo_get_data belum dibuat
     # path('api/yolo-receive/', views.yolo_receive_data, name='yolo_receive_data'),
     # path('api/yolo-get/', views.yolo_get_data, name='yolo_get_data'),
+    
+    path("notif/read-all/", mark_read, name="notif_read_all"),
+    # API NOTIFIKASI REALTIME
+    path('api/get-notif/', views.get_notifications, name='get_notifications'),
 ]

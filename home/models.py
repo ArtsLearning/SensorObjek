@@ -7,5 +7,13 @@ class Pelanggaran(models.Model):
     lokasi = models.CharField(max_length=255, default="-")
     jenis = models.CharField(max_length=100, default="Tidak Pakai Helm")  # jenis pelanggaran
 
-    def __str__(self):
+    def _str_(self):
         return f"Pelanggaran {self.id} - {self.jenis}"
+
+class Notifikasi(models.Model):
+    pesan = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def _str_(self):
+        return self.pesan
