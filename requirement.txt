@@ -17,5 +17,6 @@ pyserial==3.5
 torch>=2.0.0
 torchvision>=0.15.0
 
-# tambahan stabil
+paho-mqtt>=1.6.1
+
 psutil>=5.9.0
