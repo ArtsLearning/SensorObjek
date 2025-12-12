@@ -68,10 +68,61 @@
         </button>
     </div>
 
+    <!-- ========================= -->
+    <!-- 3. CHANGE PASSWORD -->
+    <!-- ========================= -->
+    <div class="bg-white rounded-xl shadow p-6 space-y-6">
+        <h2 class="text-xl font-semibold text-gray-700">Ubah Password</h2>
 
+        {% if messages %}
+            {% for message in messages %}
+                <div class="px-4 py-2 rounded-lg text-sm
+                    {% if message.tags == 'success' %}
+                        bg-green-100 text-green-700
+                    {% else %}
+                        bg-red-100 text-red-700
+                    {% endif %}
+                ">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{% url 'change_password' %}" id="passwordForm">
+            {% csrf_token %}
+
+            <!-- ALERT -->
+            <div id="passwordError"
+                class="hidden mb-4 px-4 py-2 rounded-lg text-sm"></div>
+
+            <div class="mb-4">
+                <label>Password Lama</label>
+                <input type="password" id="old_password" name="old_password"
+                    class="w-full px-4 py-2 border rounded-lg" required>
+            </div>
+
+            <div class="mb-4">
+                <label>Password Baru</label>
+                <input type="password" id="new_password1" name="new_password1"
+                    class="w-full px-4 py-2 border rounded-lg" required>
+                <small id="passwordHint" class="text-sm text-gray-500"></small>
+            </div>
+
+            <div class="mb-4">
+                <label>Konfirmasi Password Baru</label>
+                <input type="password" id="new_password2" name="new_password2"
+                    class="w-full px-4 py-2 border rounded-lg" required>
+            </div>
+
+            <button type="submit"
+                    class="px-5 py-2 bg-red-600 text-white rounded-lg">
+                Ubah Password
+            </button>
+        </form>
+    </div>
 
     <!-- ========================= -->
-    <!-- 3. EXPORT DATA -->
+    <!-- 4. EXPORT DATA -->
     <!-- ========================= -->
     <div class="bg-white rounded-xl shadow p-6 space-y-4">
         <h2 class="text-xl font-semibold text-gray-700">Manajemen Data</h2>
@@ -90,5 +141,78 @@
     </div>
 
 </div>
+
+
+<script>
+    const newPass = document.getElementById("new_password1");
+    const confirmPass = document.getElementById("new_password2");
+    const oldPass = document.getElementById("old_password");
+    const alertBox = document.getElementById("passwordError");
+    const hint = document.getElementById("passwordHint");
+    const form = document.getElementById("passwordForm");
+
+    function showError(msg) {
+        alertBox.innerText = msg;
+        alertBox.className = "mb-4 px-4 py-2 rounded-lg bg-red-100 text-red-700 text-sm";
+        alertBox.classList.remove("hidden");
+    }
+
+    function showSuccess(msg) {
+        alertBox.innerText = msg;
+        alertBox.className = "mb-4 px-4 py-2 rounded-lg bg-green-100 text-green-700 text-sm";
+        alertBox.classList.remove("hidden");
+    }
+
+    function hideError() {
+        alertBox.classList.add("hidden");
+    }
+
+    // VALIDASI SAAT KETIK PASSWORD BARU
+    newPass.addEventListener("input", function () {
+        const value = newPass.value;
+
+        if (value.length < 8) {
+            hint.innerText = "❌ Minimal 8 karakter";
+            hint.className = "text-sm text-red-500";
+        } else if (!/[A-Za-z]/.test(value) || !/[0-9]/.test(value)) {
+            hint.innerText = "❌ Harus mengandung huruf dan angka";
+            hint.className = "text-sm text-red-500";
+        } else {
+            hint.innerText = "✅ Password memenuhi syarat";
+            hint.className = "text-sm text-green-600";
+        }
+    });
+
+    // VALIDASI SAAT SUBMIT
+    form.addEventListener("submit", function (e) {
+        hideError();
+
+        if (newPass.value.length < 8) {
+            e.preventDefault();
+            showError("Password baru minimal 8 karakter.");
+            return;
+        }
+
+        if (!/[A-Za-z]/.test(newPass.value) || !/[0-9]/.test(newPass.value)) {
+            e.preventDefault();
+            showError("Password harus mengandung huruf dan angka.");
+            return;
+        }
+
+        if (newPass.value !== confirmPass.value) {
+            e.preventDefault();
+            showError("Konfirmasi password tidak cocok.");
+            return;
+        }
+
+        if (newPass.value === oldPass.value) {
+            e.preventDefault();
+            showError("Password baru tidak boleh sama dengan password lama.");
+            return;
+        }
+    });
+</script>
+
+
 
 {% endblock %}

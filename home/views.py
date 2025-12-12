@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -44,6 +45,7 @@ def livestream(request):
 # ================================================================
 # DASHBOARD ADMIN
 # ================================================================
+@login_required
 def dashboard(request):
     pelanggaran_terbaru = Pelanggaran.objects.order_by('-id')[:5]
 
@@ -67,6 +69,7 @@ def mark_read(request):
 # ================================================================
 # LIVESTREAM ADMIN
 # ================================================================
+@login_required
 def livestream_dashboard(request):
     return render(request, "home/livestream_dashboard.html")
 
@@ -74,6 +77,7 @@ def livestream_dashboard(request):
 # ================================================================
 # SETTINGS ADMIN
 # ================================================================
+@login_required
 def setting_page(request):
     return render(request, 'home/settings_admin.html')
 
@@ -81,6 +85,7 @@ def setting_page(request):
 # ================================================================
 # FULL TABEL PELANGGARAN (ADMIN)
 # ================================================================
+@login_required
 def tabel_pelanggaran(request):
     data = Pelanggaran.objects.all().order_by('-id')
     return render(request, 'home/tabel_pelanggaran.html', {'data': data})
