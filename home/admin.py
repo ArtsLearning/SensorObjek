@@ -1,39 +1,40 @@
 from django.contrib import admin
-from .models import Pelanggaran
+from .models import Pelanggaran, Notifikasi, TrafficHarian
 
 
-# ===============================
-# PENDAFTARAN MODEL KE DJANGO ADMIN
-# ===============================
+# =====================================================
+# ADMIN PELANGGARAN
+# =====================================================
 @admin.register(Pelanggaran)
 class PelanggaranAdmin(admin.ModelAdmin):
-    """
-    Kelas ini mengatur bagaimana model Pelanggaran
-    ditampilkan, difilter, dan dicari di halaman admin Django.
-    """
-
-    # Kolom yang akan muncul di daftar tabel admin
-    list_display = ("id", "tanggal", "waktu", "lokasi", "bukti_foto")
-
-    # Tambahkan fitur filter di sidebar admin
-    list_filter = ("tanggal",)
-
-    # Tambahkan kolom pencarian di atas tabel
-    search_fields = ("lokasi",)
-
-    # Urutan data (opsional)
+    list_display = ("id", "tanggal", "waktu", "lokasi", "jenis")
+    list_filter = ("tanggal", "lokasi")
+    search_fields = ("lokasi", "jenis")
     ordering = ("-tanggal", "-waktu")
-
-    # Jumlah item per halaman (opsional)
     list_per_page = 20
 
-    # Judul halaman admin (opsional, lebih rapi)
-    verbose_name = "Data Pelanggaran"
-    verbose_name_plural = "Data Pelanggaran"
+
+# =====================================================
+# ADMIN NOTIFIKASI
+# =====================================================
+@admin.register(Notifikasi)
+class NotifikasiAdmin(admin.ModelAdmin):
+    list_display = ("pesan", "created_at", "is_read")
+    list_filter = ("is_read",)
+    ordering = ("-created_at",)
 
 
-# ===============================
-# CATATAN:
-# Jangan daftarkan ulang model Pelanggaran secara manual
-# karena sudah dilakukan otomatis lewat @admin.register
-# ===============================
+# =====================================================
+# ADMIN TRAFFIC HARIAN (INI YANG ERROR TADI)
+# =====================================================
+@admin.register(TrafficHarian)
+class TrafficHarianAdmin(admin.ModelAdmin):
+    list_display = (
+        "tanggal",
+        "total_motor",
+        "total_mobil",
+        "total_pelanggar",
+    )
+
+    list_filter = ("tanggal",)
+    ordering = ("-tanggal",)
