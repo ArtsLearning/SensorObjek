@@ -4,19 +4,25 @@ from django.conf import settings
 from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-
+from datetime import date
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+from django.db.models import Sum
+from django.db.models.functions import TruncMonth
+
 
 import os
 import json
 import time
 
-from .models import Pelanggaran, Notifikasi
-
+from .models import (
+    Pelanggaran,
+    Notifikasi,
+    TrafficHarian
+)
 
 # ================================================================
-# GLOBAL DATA UNTUK YOLO REALTIME
+# GLOBAL DATA UNTUK YOLO REALTIME (TIDAK DISIMPAN KE DB)
 # ================================================================
 YOLO_DATA = {
     "motor": 0,
@@ -26,7 +32,6 @@ YOLO_DATA = {
     "stream_active": False,
     "last_update": None,
 }
-
 
 # ================================================================
 # HOME PAGE
@@ -48,7 +53,6 @@ def livestream(request):
 @login_required
 def dashboard(request):
     pelanggaran_terbaru = Pelanggaran.objects.order_by('-id')[:5]
-
     notif_list = Notifikasi.objects.order_by('-created_at')[:5]
     notif_unread = Notifikasi.objects.filter(is_read=False).count()
 
@@ -58,8 +62,9 @@ def dashboard(request):
         "notif_unread": notif_unread,
     })
 
+
 # ================================================================
-# MARK READ
+# MARK NOTIFIKASI SEBAGAI DIBACA
 # ================================================================
 def mark_read(request):
     Notifikasi.objects.filter(is_read=False).update(is_read=True)
@@ -83,7 +88,7 @@ def setting_page(request):
 
 
 # ================================================================
-# FULL TABEL PELANGGARAN (ADMIN)
+# TABEL PELANGGARAN (ADMIN)
 # ================================================================
 @login_required
 def tabel_pelanggaran(request):
@@ -92,7 +97,7 @@ def tabel_pelanggaran(request):
 
 
 # ================================================================
-# DELETE DATA (ADMIN)
+# DELETE DATA PELANGGARAN
 # ================================================================
 def delete_pelanggaran(request, id):
     pelanggaran = get_object_or_404(Pelanggaran, id=id)
@@ -117,7 +122,7 @@ def logout_user(request):
 
 
 # ================================================================
-# EXPORT PDF
+# EXPORT PDF PELANGGARAN
 # ================================================================
 def export_pdf(request, id):
     pelanggaran = get_object_or_404(Pelanggaran, id=id)
@@ -150,7 +155,7 @@ def export_pdf(request, id):
 
 
 # ================================================================
-# TERIMA DATA YOLO (POST)
+# API TERIMA DATA YOLO REALTIME (UNTUK DASHBOARD)
 # ================================================================
 @csrf_exempt
 def yolo_test(request):
@@ -167,20 +172,16 @@ def yolo_test(request):
             YOLO_DATA["stream_active"] = bool(data.get("stream_active", True))
             YOLO_DATA["last_update"] = time.strftime("%Y-%m-%d %H:%M:%S")
 
-            print("\n=== DATA DARI YOLO ===")
-            print(json.dumps(YOLO_DATA, indent=4))
-
-            return JsonResponse({"status": "ok", "msg": "Data YOLO diterima"}, status=200)
+            return JsonResponse({"status": "ok"}, status=200)
 
         except Exception as e:
-            print("Error saat parsing data YOLO:", e)
-            return JsonResponse({"status": "error", "msg": "Invalid JSON"}, status=400)
+            return JsonResponse({"status": "error", "msg": str(e)}, status=400)
 
-    return JsonResponse({"status": "error", "msg": "Gunakan metode POST"}, status=405)
+    return JsonResponse({"status": "error", "msg": "POST only"}, status=405)
 
 
 # ================================================================
-# KIRIM DATA YOLO KE DASHBOARD (GET)
+# API KIRIM DATA YOLO REALTIME KE FRONTEND
 # ================================================================
 def get_yolo_data(request):
     global YOLO_DATA
@@ -195,21 +196,72 @@ def get_yolo_data(request):
             "last_update": None
         })
 
-    return JsonResponse(YOLO_DATA, safe=False)
-
+    return JsonResponse(YOLO_DATA)
 
 
 # ================================================================
-#  USER PELANGGARAN PAGE (✔ BARU DITAMBAHKAN)
+# API UPDATE TOTAL TRAFFIC HARIAN (INI YANG BARU)
+# ================================================================
+@csrf_exempt
+def update_traffic_harian(request):
+    if request.method != "POST":
+        return JsonResponse({"status": "error", "msg": "POST only"}, status=405)
+
+    data = json.loads(request.body.decode("utf-8"))
+    today = date.today()
+
+    traffic, created = TrafficHarian.objects.get_or_create(
+        tanggal=today,
+        defaults={
+            "total_motor": 0,
+            "total_mobil": 0,
+            "total_pelanggar": 0,
+        }
+    )
+
+    traffic.total_motor += int(data.get("motor", 0))
+    traffic.total_mobil += int(data.get("mobil", 0))
+    traffic.total_pelanggar += int(data.get("pelanggar", 0))
+    traffic.save()
+
+    return JsonResponse({
+        "status": "ok",
+        "tanggal": str(today),
+        "motor": traffic.total_motor,
+        "mobil": traffic.total_mobil,
+        "pelanggar": traffic.total_pelanggar,
+        "total": traffic.total_motor + traffic.total_mobil
+    })
+
+
+# ================================================================
+# API GET TOTAL TRAFFIC HARIAN (UNTUK UI)
+# ================================================================
+def get_traffic_harian(request):
+    today = date.today()
+    traffic = TrafficHarian.objects.filter(tanggal=today).first()
+
+    if not traffic:
+        return JsonResponse({
+            "motor": 0,
+            "mobil": 0,
+            "pelanggar": 0,
+            "total": 0,
+        })
+
+    return JsonResponse({
+        "motor": traffic.total_motor,
+        "mobil": traffic.total_mobil,
+        "pelanggar": traffic.total_pelanggar,
+        "total": traffic.total_motor + traffic.total_mobil
+    })
+
+
+# ================================================================
+# USER PELANGGARAN PAGE
 # ================================================================
 def user_pelanggaran(request):
-    """
-    Halaman tabel hasil deteksi untuk USER.
-    Tidak ada delete/export.
-    Bisa filter tanggal.
-    """
     tanggal = request.GET.get("tanggal")
-
     data = Pelanggaran.objects.all().order_by('-id')
 
     if tanggal:
@@ -219,16 +271,13 @@ def user_pelanggaran(request):
         "data": data,
         "filter_tanggal": tanggal or "",
     })
-    
+
+
 # ================================================================
-# API GET NOTIFIKASI REALTIME (JSON)
+# API GET NOTIFIKASI REALTIME
 # ================================================================
 def get_notifications(request):
-    # UBAH DISINI: Hapus .filter(is_read=False) untuk list notifikasi
-    # Jadi dia akan mengambil 5 notifikasi TERBARU (baik yg sudah dibaca maupun belum)
     notif_list = Notifikasi.objects.order_by('-created_at')[:5]
-    
-    # Hitung jumlah yang belum dibaca (khusus untuk angka merah)
     notif_unread = Notifikasi.objects.filter(is_read=False).count()
 
     data_list = []
@@ -242,3 +291,31 @@ def get_notifications(request):
         "unread_count": notif_unread,
         "notifications": data_list
     })
+
+# ================================================================
+# API TREND TOTAL KENDARAAN PER BULAN (UNTUK GRAFIK DASHBOARD)
+# ================================================================
+def traffic_trend_bulanan(request):
+    qs = (
+        TrafficHarian.objects
+        .annotate(bulan=TruncMonth("tanggal"))
+        .values("bulan")
+        .annotate(
+            motor=Sum("total_motor"),
+            mobil=Sum("total_mobil"),
+        )
+        .order_by("bulan")
+    )
+
+    labels = []
+    totals = []
+
+    for row in qs:
+        labels.append(row["bulan"].strftime("%b %Y"))  # contoh: Jan 2025
+        totals.append((row["motor"] or 0) + (row["mobil"] or 0))
+
+    return JsonResponse({
+        "labels": labels,
+        "data": totals
+    })
+

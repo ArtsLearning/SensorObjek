@@ -30,6 +30,11 @@ urlpatterns = [
     # API UNTUK YOLO & REALTIME DASHBOARD
     # =============================
 
+    path("api/update-traffic-harian/", views.update_traffic_harian),
+    path("api/traffic-trend-bulanan/", views.traffic_trend_bulanan),
+
+
+
     # versi lama (dipertahankan untuk kompatibilitas)
     path('api/yolo-test/', views.yolo_test, name='yolo_test'),
 

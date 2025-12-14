@@ -28,6 +28,9 @@ RTSP_URL = r"D:\Traffic_eye\SensorObjek\video\test3.mp4"
 DJANGO_SEND_DATA_URL    = "http://127.0.0.1:8000/api/yolo-test/"
 DJANGO_UPLOAD_IMAGE_URL = "http://127.0.0.1:8000/api/save-violation/"
 
+# ✅ TAMBAHAN: endpoint update total harian
+DJANGO_DAILY_URL        = "http://127.0.0.1:8000/api/update-traffic-harian/"
+
 DEBUG_SHOW = True
 LINE_Y = 540  # posisi garis hitung kendaraan (di resolusi 1280x720)
 
@@ -38,7 +41,7 @@ MIN_HEAD_SIZE   = 120    # tinggi min bbox kepala (di resolusi 1280x720)
 STABLE_FRAMES   = 10
 NOHELM_TTL      = 120
 TRACK_TTL       = 25
-SEND_INTERVAL   = 1.0    # kirim data ke Django tiap 1 detik
+SEND_INTERVAL   = 1.0    # kirim data realtime ke Django tiap 1 detik
 
 # resolusi tampilan & resolusi deteksi (lebih kecil supaya enteng)
 VIEW_W, VIEW_H = 1280, 720
@@ -104,6 +107,19 @@ def crop(frame, box, pad=20):
     h, w = frame.shape[:2]
     return frame[max(0, y1 - pad):min(h, y2 + pad),
                  max(0, x1 - pad):min(w, x2 + pad)]
+
+
+# ======================================================
+# POST ASYNC (UTILITY)
+# ======================================================
+
+def post_async(url, payload, timeout=1):
+    def task():
+        try:
+            requests.post(url, json=payload, timeout=timeout)
+        except Exception:
+            pass
+    threading.Thread(target=task, daemon=True).start()
 
 
 # ======================================================
@@ -255,7 +271,7 @@ def match_tracks(tracks, detections, frame_id, max_dist=60):
 
 
 # ======================================================
-# KIRIM DATA KE DJANGO (ASYNC)
+# KIRIM DATA REALTIME KE DJANGO (ASYNC)
 # ======================================================
 
 def send_counts_to_django_async(motor, mobil, pelanggar, stream_active=True):
@@ -266,14 +282,7 @@ def send_counts_to_django_async(motor, mobil, pelanggar, stream_active=True):
         "total": motor + mobil,
         "stream_active": stream_active,
     }
-
-    def task():
-        try:
-            requests.post(DJANGO_SEND_DATA_URL, json=payload, timeout=1)
-        except:
-            pass
-
-    threading.Thread(target=task, daemon=True).start()
+    post_async(DJANGO_SEND_DATA_URL, payload, timeout=1)
 
 
 # ======================================================
@@ -331,10 +340,22 @@ def main():
 
         tracks = match_tracks(tracks, detections, frame_id)
 
+        # ---------------- HITUNG KENDARAAN SAAT MELEWATI GARIS ----------------
         for tr in tracks:
             if (not tr.counted and
                ((tr.last_cy < LINE_Y <= tr.cy) or (tr.last_cy > LINE_Y >= tr.cy))):
+
                 tr.counted = True
+
+                # ✅ UPDATE TOTAL HARIAN (DB) - 1 kendaraan = 1 increment
+                daily_payload = {
+                    "motor": 1 if tr.cls == "motor" else 0,
+                    "mobil": 1 if tr.cls == "car" else 0,
+                    "pelanggar": 0
+                }
+                post_async(DJANGO_DAILY_URL, daily_payload, timeout=1)
+
+                # realtime counter (tetap)
                 if tr.cls == "motor":
                     motor_count += 1
                 elif tr.cls == "car":
@@ -373,9 +394,12 @@ def main():
                 # SAVE + UPLOAD (ASYNC)
                 save_and_upload_async(frame, box, sid)
 
+                # ✅ UPDATE TOTAL PELANGGAR HARIAN (DB)
+                post_async(DJANGO_DAILY_URL, {"motor": 0, "mobil": 0, "pelanggar": 1}, timeout=1)
+
         clean_memory(frame_id)
 
-        # ---------------- KIRIM DATA DASHBOARD (ASYNC) ----------------
+        # ---------------- KIRIM DATA DASHBOARD REALTIME (ASYNC) ----------------
         if time.time() - last_send >= SEND_INTERVAL:
             send_counts_to_django_async(motor_count, car_count, viol_count)
             last_send = time.time()

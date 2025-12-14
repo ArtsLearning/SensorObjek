@@ -280,20 +280,36 @@ window.donutChart = new Chart(document.getElementById("donutChart"), {
     options: { cutout: "65%" }
 });
 
-window.lineChart = new Chart(document.getElementById("lineChart"), {
-    type: "line",
-    data: {
-        labels: ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu"],
-        datasets: [{
-            label: "Total Kendaraan",
-            data: [5000, 6400, 5800, 7200, 6900, 7500, 8000, 8600],
-            borderColor: "#2563eb",
-            backgroundColor: "#2563eb40",
-            tension: 0.3,
-            fill: true
-        }]
+window.lineChart = new Chart(
+    document.getElementById("lineChart"),
+    {
+        type: "line",
+        data: {
+            labels: [],
+            datasets: [{
+                label: "Total Kendaraan",
+                data: [],
+                borderColor: "#2563eb",
+                backgroundColor: "#2563eb40",
+                tension: 0.3,
+                fill: true
+            }]
+        }
     }
-});
+);
+
+function loadMonthlyTrend() {
+    fetch("/api/traffic-trend-bulanan/")
+        .then(res => res.json())
+        .then(data => {
+            window.lineChart.data.labels = data.labels;
+            window.lineChart.data.datasets[0].data = data.data;
+            window.lineChart.update();
+        })
+        .catch(err => console.error("Trend error:", err));
+}
+
+loadMonthlyTrend();
 
 function updateCharts(data) {
     window.donutChart.data.datasets[0].data = [
