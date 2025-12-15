@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<div class="space-y-10">
+<div class="space-y-10" data-notif-enabled="{{ notif_enabled|yesno:'1,0' }}">
 
     <!-- ======================== -->
     <!-- TOP SEARCH + PROFILE -->
@@ -36,13 +36,21 @@
                     </div>
 
                     <div id="notif-list-container" class="max-h-60 overflow-y-auto space-y-2">
-                        <p class="text-gray-400 text-sm text-center py-4">Memuat data...</p>
+                        <p id="notif-placeholder" class="text-gray-400 text-sm text-center py-4"> Notifikasi belum tersedia.</p>
                     </div>
                 </div>
             </div>
 
-            <img src="https://randomuser.me/api/portraits/men/32.jpg"
-                class="w-12 h-12 rounded-full border-2 border-blue-500 object-cover"/>
+            <div class="flex items-center gap-3">
+                <!-- NAMA ADMIN -->
+                <span class="text-sm font-medium text-gray-700">
+                    {{ request.user.first_name|default:request.user.username }}
+                </span>
+
+                <!-- FOTO ADMIN -->
+                <img src="{{ request.user.userprofile.avatar }}" class="w-12 h-12 rounded-full border-2 border-blue-500 object-cover"/>
+
+            </div>
         </div>
     </div>
 
@@ -214,34 +222,21 @@
     </div>
 </div>
 
-<!-- ======================== -->
-<!-- Notifikasi -->
-<!-- ======================== -->
-<script>
-function toggleNotif() {
-    const box = document.getElementById("notifBox");
-    box.classList.toggle("hidden");
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/realtime.js' %}"></script>
 
-    // ketika notifikasi dibuka, tandai sebagai sudah dibaca
-    if (!box.classList.contains("hidden")) {
-        fetch("/notif/read-all/");
-    }
-}
-</script>
-
-<!-- ======================== -->
-<!-- JAVASCRIPT: MODAL -->
-<!-- ======================== -->
 <script>
+/* =====================================================
+   MODAL
+===================================================== */
 function openDetail(id, img, tanggal, waktu, lokasi) {
     document.getElementById("detailId").innerText = id;
     document.getElementById("detailImg").src = img;
     document.getElementById("detailTime").innerText = tanggal + " • " + waktu;
     document.getElementById("detailLocation").innerText = lokasi;
-
-    document.getElementById("exportBtn").onclick = () =>
+    document.getElementById("exportBtn").onclick = () => {
         window.location.href = "/export/" + id + "/";
-
+    };
     document.getElementById("detailCard").classList.remove("hidden");
 }
 
@@ -257,17 +252,67 @@ function confirmDelete(id) {
 function closeDelete() {
     document.getElementById("deleteModal").classList.add("hidden");
 }
-</script>
 
+/* =====================================================
+   NOTIFIKASI (SATU-SATUNYA)
+===================================================== */
+let notifInterval = null;
 
+function toggleNotif() {
+    const box = document.getElementById("notifBox");
+    const badge = document.getElementById("notif-badge");
 
-<!-- ======================== -->
-<!-- CHARTS -->
-<!-- ======================== -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    if (!box) return;
 
-<script>
-window.donutChart = new Chart(document.getElementById("donutChart"), {
+    const isOpen = !box.classList.contains("hidden");
+
+    if (isOpen) {
+        box.classList.add("hidden");
+        fetch("/notif/read-all/").then(() => {
+            badge?.classList.add("hidden");
+        });
+    } else {
+        box.classList.remove("hidden");
+    }
+}
+
+function fetchNotifications() {
+    fetch("/api/get-notif/")
+        .then(res => res.json())
+        .then(data => {
+            const badge = document.getElementById("notif-badge");
+            const list = document.getElementById("notif-list-container");
+            if (!badge || !list) return;
+
+            if (data.unread_count > 0) {
+                badge.innerText = data.unread_count;
+                badge.classList.remove("hidden");
+            } else {
+                badge.classList.add("hidden");
+            }
+
+            list.innerHTML = "";
+            if (data.notifications.length === 0) {
+                list.innerHTML =
+                    `<p class="text-gray-500 text-sm text-center py-2">
+                        Tidak ada notifikasi untuk ditampilkan.
+                    </p>`;
+                return;
+            }
+            data.notifications.forEach(n => {
+                list.innerHTML += `
+                    <div class="border-b py-2 text-sm hover:bg-gray-50 px-2 rounded">
+                        <p class="font-medium text-gray-800">${n.pesan}</p>
+                        <span class="text-xs text-gray-400">${n.waktu}</span>
+                    </div>`;
+            });
+        });
+}
+
+/* =====================================================
+   CHART
+===================================================== */
+const donutChart = new Chart(document.getElementById("donutChart"), {
     type: "doughnut",
     data: {
         labels: ["Motor", "Mobil", "Pelanggar"],
@@ -280,145 +325,76 @@ window.donutChart = new Chart(document.getElementById("donutChart"), {
     options: { cutout: "65%" }
 });
 
-window.lineChart = new Chart(
-    document.getElementById("lineChart"),
-    {
-        type: "line",
-        data: {
-            labels: [],
-            datasets: [{
-                label: "Total Kendaraan",
-                data: [],
-                borderColor: "#2563eb",
-                backgroundColor: "#2563eb40",
-                tension: 0.3,
-                fill: true
-            }]
-        }
+const lineChart = new Chart(document.getElementById("lineChart"), {
+    type: "line",
+    data: {
+        labels: [],
+        datasets: [{
+            label: "Total Kendaraan",
+            data: [],
+            borderColor: "#2563eb",
+            backgroundColor: "#2563eb40",
+            tension: 0.3,
+            fill: true
+        }]
     }
-);
+});
 
 function loadMonthlyTrend() {
     fetch("/api/traffic-trend-bulanan/")
         .then(res => res.json())
         .then(data => {
-            window.lineChart.data.labels = data.labels;
-            window.lineChart.data.datasets[0].data = data.data;
-            window.lineChart.update();
-        })
-        .catch(err => console.error("Trend error:", err));
+            lineChart.data.labels = data.labels;
+            lineChart.data.datasets[0].data = data.data;
+            lineChart.update();
+        });
 }
 
-loadMonthlyTrend();
-
-function updateCharts(data) {
-    window.donutChart.data.datasets[0].data = [
-        data.motor, data.mobil, data.pelanggar
-    ];
-    window.donutChart.update();
-}
-</script>
-
-<!-- ======================== -->
-<!-- FILTER SCRIPT -->
-<!-- ======================== -->
-<script>
+/* =====================================================
+   FILTER
+===================================================== */
 const fDate = document.getElementById("filterDate");
-
-function applyFilterDate() {
-    const selected = fDate.value;
-    const rows = document.querySelectorAll("table tbody tr");
-
-    rows.forEach(row => {
-        const cell = row.querySelector("td[data-date]");
-        if (!cell) return;
-
-        const rowDate = cell.dataset.date; // format YYYY-MM-DD
-        row.style.display = (selected === "" || rowDate === selected)
-            ? ""
-            : "none";
+if (fDate) {
+    fDate.addEventListener("change", () => {
+        const selected = fDate.value;
+        document.querySelectorAll("table tbody tr").forEach(row => {
+            const cell = row.querySelector("td[data-date]");
+            if (!cell) return;
+            row.style.display =
+                selected === "" || cell.dataset.date === selected ? "" : "none";
+        });
     });
 }
 
-fDate.addEventListener("change", applyFilterDate);
-</script>
+/* =====================================================
+   INIT
+===================================================== */
+loadMonthlyTrend();
 
-<!-- REALTIME -->
-<script src="{% static 'js/realtime.js' %}"></script>
-<script>
-// FUNGSI TOGGLE BOX
-// FUNGSI BUKA TUTUP LONCENG (LOGIKA BARU)
-// FUNGSI BUKA TUTUP LONCENG (FIXED: Angka Hilang, List Tetap Ada)
-function toggleNotif() {
-    const box = document.getElementById("notifBox");
+const wrapper = document.querySelector("[data-notif-enabled]");
+const NOTIF_ENABLED = wrapper?.dataset.notifEnabled === "1";
+
+if (NOTIF_ENABLED) {
+    fetchNotifications();
+    notifInterval = setInterval(fetchNotifications, 3000);
+} else {
     const badge = document.getElementById("notif-badge");
-    
-    const isClosed = box.classList.contains("hidden");
+    const box = document.getElementById("notifBox");
+    const list = document.getElementById("notif-list-container");
 
-    if (isClosed) {
-        // === SAAT DIBUKA ===
-        box.classList.remove("hidden");
-    
-    } else {
-        // === SAAT DITUTUP ===
-        box.classList.add("hidden");
+    if (badge) badge.classList.add("hidden");
+    if (box) box.classList.add("hidden");
 
-        // 1. Lapor ke server "Sudah baca semua" (Biar database update)
-        fetch("/notif/read-all/")
-        .then(() => {
-            // 2. Sembunyikan Badge Merah secara visual langsung (biar responsif)
-            if(badge) badge.classList.add("hidden");
-            
-            // 3. Refresh data (Nanti server akan kirim unread_count = 0, tapi list tetap ada 5)
-            fetchNotifications(); 
-        });
+    if (list) {
+        list.innerHTML = `
+            <p class="text-gray-400 text-sm text-center py-4">
+                Notifikasi sistem sedang dinonaktifkan oleh admin.
+            </p>
+        `;
     }
 }
-// FUNGSI FETCH DATA
-function fetchNotifications() {
-    fetch('/api/get-notif/')
-    .then(response => {
-        if (!response.ok) throw new Error("Gagal connect API");
-        return response.json();
-    })
-    .then(data => {
-        // Ambil elemen
-        const badge = document.getElementById("notif-badge");
-        const listContainer = document.getElementById("notif-list-container");
 
-        // Cek dulu elemennya ada gak (Safety Check)
-        if (!badge || !listContainer) return;
 
-        // 1. Update Badge
-        if (data.unread_count > 0) {
-            badge.innerText = data.unread_count;
-            badge.classList.remove("hidden");
-        } else {
-            badge.classList.add("hidden");
-        }
-
-        // 2. Update List
-        listContainer.innerHTML = ""; 
-
-        if (data.notifications.length === 0) {
-            listContainer.innerHTML = '<p class="text-gray-500 text-sm text-center py-2">Tidak ada notifikasi baru.</p>';
-        } else {
-            data.notifications.forEach(n => {
-                const item = `
-                    <div class="border-b py-2 text-sm hover:bg-gray-50 px-2 rounded">
-                        <p class="font-medium text-gray-800">${n.pesan}</p>
-                        <span class="text-xs text-gray-400">${n.waktu}</span>
-                    </div>
-                `;
-                listContainer.innerHTML += item;
-            });
-        }
-    })
-    .catch(err => console.error("Error Notif:", err));
-}
-
-// Jalankan rutin
-setInterval(fetchNotifications, 3000);
-fetchNotifications();
 </script>
+
 {% endblock %}

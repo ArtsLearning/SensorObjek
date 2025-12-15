@@ -3,12 +3,15 @@ from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
 from datetime import date
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from .models import UserProfile
 
 
 import os
@@ -18,7 +21,8 @@ import time
 from .models import (
     Pelanggaran,
     Notifikasi,
-    TrafficHarian
+    TrafficHarian,
+    SystemSetting
 )
 
 # ================================================================
@@ -56,11 +60,15 @@ def dashboard(request):
     notif_list = Notifikasi.objects.order_by('-created_at')[:5]
     notif_unread = Notifikasi.objects.filter(is_read=False).count()
 
+    setting = SystemSetting.objects.first()
+
     return render(request, 'home/dashboard.html', {
         "pelanggaran_terbaru": pelanggaran_terbaru,
         "notif_list": notif_list,
         "notif_unread": notif_unread,
+        "notif_enabled": setting.notif_enabled if setting else False
     })
+
 
 
 # ================================================================
@@ -84,7 +92,18 @@ def livestream_dashboard(request):
 # ================================================================
 @login_required
 def setting_page(request):
-    return render(request, 'home/settings_admin.html')
+    setting, _ = SystemSetting.objects.get_or_create(id=1)
+
+    if request.method == "POST":
+        status = request.POST.get("notif_status")
+        setting.notif_enabled = True if status == "1" else False
+        setting.save()
+        return redirect("setting")
+
+    return render(request, 'home/settings_admin.html', {
+        "setting": setting
+    })
+
 
 
 # ================================================================
@@ -277,6 +296,14 @@ def user_pelanggaran(request):
 # API GET NOTIFIKASI REALTIME
 # ================================================================
 def get_notifications(request):
+    setting = SystemSetting.objects.first()
+
+    if not setting or not setting.notif_enabled:
+        return JsonResponse({
+            "unread_count": 0,
+            "notifications": []
+        })
+
     notif_list = Notifikasi.objects.order_by('-created_at')[:5]
     notif_unread = Notifikasi.objects.filter(is_read=False).count()
 
@@ -291,6 +318,7 @@ def get_notifications(request):
         "unread_count": notif_unread,
         "notifications": data_list
     })
+
 
 # ================================================================
 # API TREND TOTAL KENDARAAN PER BULAN (UNTUK GRAFIK DASHBOARD)
@@ -318,4 +346,38 @@ def traffic_trend_bulanan(request):
         "labels": labels,
         "data": totals
     })
+
+
+# ================================================================
+# UPDATE PROFIL ADMIN (NAMA + FOTO)
+# ================================================================
+@login_required
+def update_admin_profile(request):
+    if request.method == "POST":
+        user = request.user
+
+        # AMAN: auto-create jika belum ada
+        profile, created = UserProfile.objects.get_or_create(user=user)
+
+        # UPDATE NAMA
+        name = request.POST.get("admin_name")
+        if not name:
+            messages.error(request, "Nama admin tidak boleh kosong.")
+            return redirect("setting")
+
+        user.first_name = name
+
+        # UPDATE FOTO
+        if request.FILES.get("photo"):
+            profile.photo = request.FILES["photo"]
+
+        user.save()
+        profile.save()
+
+        messages.success(
+            request,
+            "Profil admin berhasil diperbarui."
+        )
+        return redirect("setting")
+
 

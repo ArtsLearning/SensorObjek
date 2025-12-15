@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 # =====================================================
@@ -42,3 +43,36 @@ class TrafficHarian(models.Model):
 
     def __str__(self):
         return f"Traffic {self.tanggal}"
+
+# =====================================================
+# MODEL SYSTEM SETTING
+# =====================================================
+class SystemSetting(models.Model):
+    notif_enabled = models.BooleanField(default=True)
+
+    def __str__(self):
+        return "System Setting"
+
+# =====================================================
+# USER PROFILE
+# =====================================================
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    photo = models.ImageField(
+        upload_to="profile_photos/",
+        blank=True,
+        null=True
+    )
+
+    @property
+    def avatar(self):
+        """
+        Mengembalikan URL foto user.
+        Jika belum upload, pakai avatar default dari static.
+        """
+        if self.photo and self.photo.name:
+            return self.photo.url
+        return "/static/home/images/avatar.jpg"
+
+    def __str__(self):
+        return self.user.username

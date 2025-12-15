@@ -13,6 +13,7 @@ urlpatterns = [
     path('livestream-dashboard/', views.livestream_dashboard, name='livestream_dashboard'),
     path('user-pelanggaran/', views.user_pelanggaran, name='user_pelanggaran'),
     path('setting/', views.setting_page, name='setting'),
+    path("update-admin-profile/", views.update_admin_profile, name="update_admin_profile"),
 
     # =============================
     # DATA PELANGGARAN
