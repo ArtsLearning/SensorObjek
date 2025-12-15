@@ -166,9 +166,67 @@ function updateLivestreamStatus(data) {
 }
 </script>
 
+<script>
+/* ===============================
+   FETCH & UPDATE DATA HARIAN
+   =============================== */
+
+async function updateHarianDashboard() {
+    try {
+        const res = await fetch("/api/get-traffic-harian/");
+        if (!res.ok) throw new Error("HTTP " + res.status);
+
+        const data = await res.json();
+        console.log("📊 Data harian:", data);
+
+        // update chart harian
+        const mapping = [
+            ["motor", "motorHarianChart"],
+            ["mobil", "mobilHarianChart"],
+            ["pelanggar", "pelanggarHarianChart"],
+            ["total", "totalHarianChart"],
+        ];
+
+        mapping.forEach(([key, chartId]) => {
+            const chart = window.liveCharts[chartId];
+            if (!chart) return;
+
+            const value = data[key] || 0;
+            chart.data.datasets[0].data = [value, 100 - (value % 100)];
+            chart.update("none");
+        });
+
+    } catch (err) {
+        console.warn("⚠️ Gagal ambil data harian:", err.message);
+    }
+}
+
+// jalankan saat halaman dibuka
+document.addEventListener("DOMContentLoaded", updateHarianDashboard);
+
+// refresh tiap 30 detik (aman & ringan)
+setInterval(updateHarianDashboard, 30000);
+</script>
+
+
+
 <!-- =============================== -->
 <!-- GLOBAL REALTIME JS -->
 <!-- =============================== -->
 <script src="{% static 'js/realtime.js' %}"></script>
 
 {% endblock %}
+
+<<style>
+canvas {
+  max-height: 120px !important;
+}
+
+.grid canvas {
+  height: 120px !important;
+}
+
+.flex.flex-col.items-center {
+  height: auto !important;
+}
+</style>

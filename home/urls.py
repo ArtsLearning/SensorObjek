@@ -32,6 +32,8 @@ urlpatterns = [
 
     path("api/update-traffic-harian/", views.update_traffic_harian),
     path("api/traffic-trend-bulanan/", views.traffic_trend_bulanan),
+    path("api/get-traffic-harian/", views.get_traffic_harian, name="get_traffic_harian"),
+
 
 
 
