@@ -355,11 +355,28 @@ def traffic_trend_bulanan(request):
 def update_admin_profile(request):
     if request.method == "POST":
         user = request.user
-
-        # AMAN: auto-create jika belum ada
         profile, created = UserProfile.objects.get_or_create(user=user)
 
+        # =====================
+        # HAPUS FOTO
+        # =====================
+        if request.POST.get("delete_photo") == "1":
+            if profile.photo:
+                try:
+                    if os.path.isfile(profile.photo.path):
+                        os.remove(profile.photo.path)
+                except Exception:
+                    pass
+
+                profile.photo = None
+                profile.save()
+
+            messages.success(request, "Foto profil berhasil dihapus.")
+            return redirect("setting")
+
+        # =====================
         # UPDATE NAMA
+        # =====================
         name = request.POST.get("admin_name")
         if not name:
             messages.error(request, "Nama admin tidak boleh kosong.")
@@ -367,17 +384,21 @@ def update_admin_profile(request):
 
         user.first_name = name
 
+        # =====================
         # UPDATE FOTO
+        # =====================
         if request.FILES.get("photo"):
+            # hapus foto lama dulu (opsional tapi direkomendasikan)
+            if profile.photo and os.path.isfile(profile.photo.path):
+                os.remove(profile.photo.path)
+
             profile.photo = request.FILES["photo"]
 
         user.save()
         profile.save()
 
-        messages.success(
-            request,
-            "Profil admin berhasil diperbarui."
-        )
+        messages.success(request, "Profil admin berhasil diperbarui.")
         return redirect("setting")
+
 
 

@@ -45,7 +45,9 @@
                         src="{{ request.user.userprofile.avatar }}"
                         class="w-20 h-20 rounded-full border-2 border-blue-500 object-cover"/>
                         
-                    <label class="cursor-pointer text-sm text-blue-600 hover:underline">
+                    <!-- GANTI FOTO -->
+                    <label
+                        class="px-3 py-1 text-sm bg-blue-600 text-white rounded cursor-pointer hover:bg-blue-700">
                         Ganti Foto
                         <input type="file"
                             name="photo"
@@ -53,6 +55,17 @@
                             class="hidden"
                             onchange="previewImage(event)">
                     </label>
+
+                    <!-- HAPUS FOTO -->
+                    {% if request.user.userprofile.photo %}
+                    <button type="submit"
+                        name="delete_photo"
+                        value="1"
+                        onclick="return confirm('Hapus foto profil?')"
+                        class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700">
+                        Hapus Foto
+                    </button>
+                    {% endif %}
                 </div>
 
                 <!-- NAMA -->
